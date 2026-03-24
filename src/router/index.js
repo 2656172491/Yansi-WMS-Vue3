@@ -39,6 +39,11 @@ const routes = [
         component: () => import('../views/Settings.vue'),
         meta: { title: '系统设置' },
       },
+      {
+        path: 'personal-center',
+        component: () => import('../views/PersonalCenter.vue'),
+        meta: { title: '个人中心' },
+      },
     ],
   },
   { path: '/', redirect: '/login' },
