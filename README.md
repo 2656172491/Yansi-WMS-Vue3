@@ -40,16 +40,3 @@ npm run build
 本项目为 WMS 仓库管理系统前端项目，基于 Vue3 + Vite 开发。
 
 ---
-
-# 你只需要做这一步：
-1. 打开你项目里的 **README.md**
-2. **全选删除**
-3. 把我上面这段**全部粘贴进去**
-4. 保存
-
-然后继续提交代码：
-```bash
-git add .
-git commit -m "docs: 更新中文README"
-git push -u origin main
-```
