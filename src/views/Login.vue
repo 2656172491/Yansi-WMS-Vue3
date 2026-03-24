@@ -59,7 +59,11 @@
 import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import { loginRules } from "@/utils/validators";
+
 const router = useRouter();
+const authStore = useAuthStore();
 
 const loginFormRef = ref(null);
 const isLoading = ref(false);
@@ -70,43 +74,21 @@ const loginForm = reactive({
   remember: false,
 });
 
-// 登录表单验证规则
-const loginRules = reactive({
-  username: [
-    { required: true, message: "请输入用户名", trigger: "blur" },
-    {
-      min: 3,
-      max: 20,
-      message: "用户名长度在 3 到 20 个字符",
-      trigger: "blur",
-    },
-  ],
-  password: [
-    { required: true, message: "请输入密码", trigger: "blur" },
-    { min: 6, max: 20, message: "密码长度在 6 到 20 个字符", trigger: "blur" },
-  ],
-});
-
 const handleLogin = async () => {
   try {
     const valid = await loginFormRef.value.validate();
     if (!valid) return;
     isLoading.value = true;
-    setTimeout(() => {
-      if (loginForm.username === "admin" && loginForm.password === "123456") {
-        ElMessage.success("登录成功！");
-        // 登录成功后的逻辑
-        localStorage.setItem('token', '123456')
-        router.push("/home");
-      } else {
-        ElMessage.error("用户名或密码错误！");
-      }
-      isLoading.value = false;
-    }, 1000);
+    await authStore.doLogin({ ...loginForm });
+    ElMessage.success("登录成功！");
+    router.push("/home");
   } catch (error) {
+    // authStore / request 拦截器已统一弹出错误消息，此处仅做降级处理
+    if (!error?.response && error?.message) {
+      ElMessage.error(error.message || "登录失败，请重试");
+    }
+  } finally {
     isLoading.value = false;
-    console.error("登录失败：", error);
-    ElMessage.error("请按照提示输入用户名和密码！");
   }
 };
 </script>

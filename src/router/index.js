@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
 import HomeView from '../views/HomeView.vue'
+import { getToken } from '../utils/storage'
 
 const routes = [
   { path: '/login', component: Login },
@@ -49,9 +50,9 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫
+// 路由守卫：使用 storage 工具统一判断 token
 router.beforeEach((to, from, next) => {
-  const isLoggedIn = !!localStorage.getItem('token')
+  const isLoggedIn = !!getToken()
   if (!isLoggedIn && to.path !== '/login') {
     next('/login')
   } else if (isLoggedIn && to.path === '/login') {

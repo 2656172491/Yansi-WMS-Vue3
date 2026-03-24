@@ -1,0 +1,34 @@
+/**
+ * errorCode.js — HTTP 及业务错误码定义
+ */
+
+export const ERROR_CODES = {
+  SUCCESS: 200,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  METHOD_NOT_ALLOWED: 405,
+  CONFLICT: 409,
+  UNPROCESSABLE: 422,
+  TOO_MANY_REQUESTS: 429,
+  SERVER_ERROR: 500,
+  BAD_GATEWAY: 502,
+  SERVICE_UNAVAILABLE: 503,
+  GATEWAY_TIMEOUT: 504,
+}
+
+export const ERROR_MESSAGES = {
+  [ERROR_CODES.BAD_REQUEST]: '请求参数有误，请检查后重试',
+  [ERROR_CODES.UNAUTHORIZED]: '登录已过期，请重新登录',
+  [ERROR_CODES.FORBIDDEN]: '您没有权限执行此操作',
+  [ERROR_CODES.NOT_FOUND]: '请求的资源不存在',
+  [ERROR_CODES.METHOD_NOT_ALLOWED]: '请求方法不被允许',
+  [ERROR_CODES.CONFLICT]: '数据冲突，请刷新后重试',
+  [ERROR_CODES.UNPROCESSABLE]: '数据校验失败，请检查输入',
+  [ERROR_CODES.TOO_MANY_REQUESTS]: '请求过于频繁，请稍后再试',
+  [ERROR_CODES.SERVER_ERROR]: '服务器内部错误，请联系管理员',
+  [ERROR_CODES.BAD_GATEWAY]: '网关错误，请稍后重试',
+  [ERROR_CODES.SERVICE_UNAVAILABLE]: '服务暂不可用，请稍后重试',
+  [ERROR_CODES.GATEWAY_TIMEOUT]: '网关超时，请稍后重试',
+}
