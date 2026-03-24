@@ -88,136 +88,46 @@
 
       <!-- 主内容区域 -->
       <el-main class="main-container">
-        <!-- 工作台 -->
-        <div v-if="activeMenu === 'dashboard'">
-          <StatsCard :cards="statCards" />
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-card shadow="never">
-                <template #header>
-                  <div class="flex justify-between items-center">
-                    <span class="font-bold">库存变动趋势</span>
-                    <el-radio-group v-model="chartPeriod" size="small">
-                      <el-radio-button label="week">本周</el-radio-button>
-                      <el-radio-button label="month">本月</el-radio-button>
-                    </el-radio-group>
-                  </div>
-                </template>
-                <div id="stockChart" style="height: 350px" />
-              </el-card>
-            </el-col>
-            <el-col :span="8">
-              <el-card shadow="never">
-                <template #header>
-                  <span class="font-bold">预警信息</span>
-                </template>
-                <AlertsPanel :alerts="alerts" />
-              </el-card>
-            </el-col>
-          </el-row>
-        </div>
-
-        <!-- 库存列表 -->
-        <div v-else-if="activeMenu === 'stock-list'">
-          <ProductsTable
-            v-model:search-query="searchQuery"
-            v-model:search-category="searchCategory"
-            :data="paginatedData"
-            :loading="loading"
-            :total="filteredTableData.length"
-            :page-size="pageSize"
-            @add="openDialog('add')"
-            @edit="openDialog('edit', $event)"
-            @delete="handleDelete"
-            @page-change="handlePageChange"
-            @reset="resetSearch"
-          />
-        </div>
-
-        <!-- 未实现模块 -->
-        <div v-else class="flex flex-col items-center justify-center h-full text-gray-400">
-          <el-icon class="text-6xl mb-4"><FolderOpened /></el-icon>
-          <p class="text-lg">该模块功能开发中...</p>
-          <p class="text-sm mt-2">当前仅演示 [工作台] 与 [库存列表] 功能</p>
-          <el-button type="primary" class="mt-6" @click="activeMenu = 'stock-list'">
-            返回库存列表
-          </el-button>
-        </div>
+        <router-view />
       </el-main>
     </el-container>
   </el-container>
-
-  <!-- 新增/编辑商品对话框 -->
-  <ProductDialog
-    v-model:visible="dialogVisible"
-    :title="dialogTitle"
-    :form-data="formData"
-    :saving="saving"
-    @save="handleSave"
-  />
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { MENU_BREADCRUMB_MAP } from '@/constants/wms.js'
-import { useDashboard } from '@/composables/useDashboard.js'
-import { useTable } from '@/composables/useTable.js'
-import { useProductForm } from '@/composables/useProductForm.js'
-import StatsCard from '@/components/StatsCard.vue'
-import AlertsPanel from '@/components/AlertsPanel.vue'
-import ProductsTable from '@/components/ProductsTable.vue'
-import ProductDialog from '@/components/ProductDialog.vue'
 
-// 仪表板数据
-const { statCards, alerts, chartPeriod } = useDashboard()
+const router = useRouter()
+const route = useRoute()
 
-// 表格数据与操作
-const {
-  loading,
-  searchQuery,
-  searchCategory,
-  pageSize,
-  filteredTableData,
-  paginatedData,
-  handlePageChange,
-  resetSearch,
-  addItem,
-  updateItem,
-  deleteItem,
-} = useTable()
+const menuRouteMap = {
+  'dashboard': '/home/dashboard',
+  'stock-list': '/home/inventory/stock-list',
+  'stock-check': '/home/inventory/stock-check',
+  'inbound': '/home/inbound',
+  'outbound': '/home/outbound',
+  'settings': '/home/settings',
+}
 
-// 表单/对话框状态
-const {
-  dialogVisible,
-  saving,
-  formData,
-  dialogTitle,
-  openDialog,
-  saveData,
-} = useProductForm()
+// 根据当前路由路径推导激活菜单项
+const activeMenu = computed(() => {
+  const path = route.path
+  for (const [key, routePath] of Object.entries(menuRouteMap)) {
+    if (path.startsWith(routePath)) return key
+  }
+  return 'dashboard'
+})
+
+const currentBreadcrumb = computed(() => route.meta?.title || '工作台')
 
 // UI 状态
 const isCollapse = ref(false)
-const activeMenu = ref('dashboard')
-
-const currentBreadcrumb = computed(() => MENU_BREADCRUMB_MAP[activeMenu.value] || '首页')
 
 const handleMenuSelect = (key) => {
-  activeMenu.value = key
-}
-
-const handleDelete = (row) => {
-  ElMessageBox.confirm('确认删除该商品？', '提示', { type: 'warning' })
-    .then(() => {
-      deleteItem(row)
-      ElMessage.success('删除成功')
-    })
-    .catch(() => {})
-}
-
-const handleSave = (data) => {
-  saveData(data, addItem, updateItem)
+  const target = menuRouteMap[key]
+  if (target) router.push(target)
 }
 
 const handleLogout = () => {
