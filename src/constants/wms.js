@@ -120,7 +120,7 @@ export const MOCK_TABLE_DATA = MOCK_INVENTORY.map((inv) => ({
   id: inv.goods_id,
   name: inv.goods_name,
   sku: inv.goods_code,
-  category: (() => CATEGORY_MAP[inv.category_id] || '')(),
+  category: CATEGORY_MAP[inv.category_id] || '',
   price: (MOCK_GOODS.find((g) => g.id === inv.goods_id)?.price ?? 0),
   stock: inv.quantity,
   status: true,
