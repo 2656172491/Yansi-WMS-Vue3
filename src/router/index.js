@@ -4,8 +4,44 @@ import HomeView from '../views/HomeView.vue'
 
 const routes = [
   { path: '/login', component: Login },
-  { path: '/home', component: HomeView },
-  { path: '/', redirect: '/login' }
+  {
+    path: '/home',
+    component: HomeView,
+    redirect: '/home/dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        component: () => import('../views/dashboard/Dashboard.vue'),
+        meta: { title: '工作台' },
+      },
+      {
+        path: 'inventory/stock-list',
+        component: () => import('../views/inventory/StockList.vue'),
+        meta: { title: '库存列表' },
+      },
+      {
+        path: 'inventory/stock-check',
+        component: () => import('../views/inventory/StockCheck.vue'),
+        meta: { title: '库存盘点' },
+      },
+      {
+        path: 'inbound',
+        component: () => import('../views/Inbound.vue'),
+        meta: { title: '入库管理' },
+      },
+      {
+        path: 'outbound',
+        component: () => import('../views/Outbound.vue'),
+        meta: { title: '出库管理' },
+      },
+      {
+        path: 'settings',
+        component: () => import('../views/Settings.vue'),
+        meta: { title: '系统设置' },
+      },
+    ],
+  },
+  { path: '/', redirect: '/login' },
 ]
 
 const router = createRouter({
