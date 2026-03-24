@@ -59,10 +59,7 @@
 import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-import { useAuthStore } from "@/store/index.js";
-
 const router = useRouter();
-const authStore = useAuthStore();
 
 const loginFormRef = ref(null);
 const isLoading = ref(false);
@@ -95,13 +92,21 @@ const handleLogin = async () => {
     const valid = await loginFormRef.value.validate();
     if (!valid) return;
     isLoading.value = true;
-    await authStore.login({ username: loginForm.username, password: loginForm.password });
-    ElMessage.success("登录成功！");
-    router.push("/home");
+    setTimeout(() => {
+      if (loginForm.username === "admin" && loginForm.password === "123456") {
+        ElMessage.success("登录成功！");
+        // 登录成功后的逻辑
+        localStorage.setItem('token', '123456')
+        router.push("/home");
+      } else {
+        ElMessage.error("用户名或密码错误！");
+      }
+      isLoading.value = false;
+    }, 1000);
   } catch (error) {
-    ElMessage.error(error?.message || "用户名或密码错误！");
-  } finally {
     isLoading.value = false;
+    console.error("登录失败：", error);
+    ElMessage.error("请按照提示输入用户名和密码！");
   }
 };
 </script>
