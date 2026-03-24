@@ -35,6 +35,11 @@ const routes = [
         meta: { title: '出库管理' },
       },
       {
+        path: 'statistics',
+        component: () => import('../views/statistics/Dashboard.vue'),
+        meta: { title: '统计分析' },
+      },
+      {
         path: 'settings',
         component: () => import('../views/Settings.vue'),
         meta: { title: '系统设置' },
@@ -60,7 +65,7 @@ router.beforeEach((to, from, next) => {
   if (!isLoggedIn && to.path !== '/login') {
     next('/login')
   } else if (isLoggedIn && to.path === '/login') {
-    next('/home')
+    next('/home/workbench')
   } else {
     next()
   }

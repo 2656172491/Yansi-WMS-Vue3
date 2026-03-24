@@ -95,7 +95,7 @@
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Box, Odometer, Goods, Download, Upload, Setting, ArrowDown, Bell } from '@element-plus/icons-vue'
+import { Box, Odometer, Goods, Download, Upload, Setting, ArrowDown, Bell, PieChart } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -118,6 +118,7 @@ const sidebarMenus = [
   },
   { index: 'inbound', title: '入库管理', icon: Download, path: '/home/inbound' },
   { index: 'outbound', title: '出库管理', icon: Upload, path: '/home/outbound' },
+  { index: 'statistics', title: '统计分析', icon: PieChart, path: '/home/statistics' },
   { index: 'settings', title: '系统设置', icon: Setting, path: '/home/settings' },
 ]
 
