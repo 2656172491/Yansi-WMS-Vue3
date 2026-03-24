@@ -1,39 +1,49 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
-import HomeView from '../views/HomeView.vue'
+import Layout from '../views/Layout.vue'
+import { isLoggedIn } from '../utils/auth.js'
 
 const routes = [
   { path: '/login', component: Login },
   {
     path: '/home',
-    component: HomeView,
-    redirect: '/home/dashboard',
+    component: Layout,
+    redirect: '/home/statistics/dashboard',
     children: [
+      // ── 统计概览 ──────────────────────────────────────
       {
-        path: 'dashboard',
-        component: () => import('../views/dashboard/Dashboard.vue'),
-        meta: { title: '工作台' },
+        path: 'statistics/dashboard',
+        component: () => import('../views/statistics/Dashboard.vue'),
+        meta: { title: '统计概览' },
+      },
+      // ── 物资管理 ──────────────────────────────────────
+      {
+        path: 'goods/list',
+        component: () => import('../views/goods/List.vue'),
+        meta: { title: '物资列表' },
+      },
+      // ── 库存管理 ──────────────────────────────────────
+      {
+        path: 'inventory/list',
+        component: () => import('../views/inventory/List.vue'),
+        meta: { title: '库存列表' },
       },
       {
-        path: 'inventory/stock-list',
-        component: () => import('../views/inventory/StockList.vue'),
-        meta: { title: '库存列表' },
+        path: 'inventory/inbound',
+        component: () => import('../views/inventory/Inbound.vue'),
+        meta: { title: '入库管理' },
+      },
+      {
+        path: 'inventory/outbound',
+        component: () => import('../views/inventory/Outbound.vue'),
+        meta: { title: '出库管理' },
       },
       {
         path: 'inventory/stock-check',
         component: () => import('../views/inventory/StockCheck.vue'),
         meta: { title: '库存盘点' },
       },
-      {
-        path: 'inbound',
-        component: () => import('../views/Inbound.vue'),
-        meta: { title: '入库管理' },
-      },
-      {
-        path: 'outbound',
-        component: () => import('../views/Outbound.vue'),
-        meta: { title: '出库管理' },
-      },
+      // ── 系统页面 ──────────────────────────────────────
       {
         path: 'settings',
         component: () => import('../views/Settings.vue'),
@@ -51,15 +61,15 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 })
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
-  const isLoggedIn = !!localStorage.getItem('token')
-  if (!isLoggedIn && to.path !== '/login') {
+  const loggedIn = isLoggedIn()
+  if (!loggedIn && to.path !== '/login') {
     next('/login')
-  } else if (isLoggedIn && to.path === '/login') {
+  } else if (loggedIn && to.path === '/login') {
     next('/home')
   } else {
     next()
