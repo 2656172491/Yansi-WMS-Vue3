@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
-import HomeView from '../views/HomeView.vue'
+import Layout from '../views/Layout.vue'
 
 const routes = [
   { path: '/login', component: Login },
   {
     path: '/home',
-    component: HomeView,
+    component: Layout,
     redirect: '/home/dashboard',
     children: [
       {
