@@ -220,12 +220,12 @@
 </style>
 
 <template>
-  <el-container style="height: 100%">
+  <el-container style="height: 100vh">
     <!-- 侧边栏 -->
     <el-aside width="auto" style="background-color: #304156">
       <div class="logo-container" v-if="!isCollapse">
         <el-icon class="logo-icon"><Box /></el-icon>
-        <span>智汇 WMS</span>
+        <span>言寺 WMS</span>
       </div>
       <div class="logo-container" v-else>
         <el-icon class="logo-icon"><Box /></el-icon>
@@ -314,7 +314,7 @@
 
       <!-- 主内容区域 -->
       <el-main class="main-container">
-        <!-- 视图：工作台 (Dashboard) -->
+        <!-- 视图：工作台 -->
         <div v-if="activeMenu === 'dashboard'">
           <el-row :gutter="20" class="mb-6">
             <el-col :span="6" v-for="(card, index) in statCards" :key="index">
@@ -374,10 +374,9 @@
           </el-row>
         </div>
 
-        <!-- 视图：库存列表 (Inventory) -->
+        <!-- 视图：库存列表 -->
         <div v-else-if="activeMenu === 'stock-list'">
           <el-card shadow="never">
-            <!-- 搜索栏 -->
             <div class="flex justify-between mb-4">
               <div class="flex gap-2">
                 <el-input
@@ -400,7 +399,6 @@
               </el-button>
             </div>
 
-            <!-- 表格 -->
             <el-table :data="paginatedData" stripe style="width: 100%" v-loading="loading">
               <el-table-column prop="id" label="ID" width="80"></el-table-column>
               <el-table-column label="商品图片" width="100">
@@ -451,7 +449,6 @@
               </el-table-column>
             </el-table>
 
-            <!-- 分页 -->
             <div class="table-pagination">
               <el-pagination
                 background
@@ -465,7 +462,7 @@
           </el-card>
         </div>
 
-        <!-- 视图：未实现功能 (Placeholder) -->
+        <!-- 未实现模块 -->
         <div v-else class="flex flex-col items-center justify-center h-full text-gray-400">
           <el-icon class="text-6xl mb-4"><FolderOpened /></el-icon>
           <p class="text-lg">该模块功能开发中...</p>
@@ -480,7 +477,7 @@
 
   <!-- 弹窗：新增/编辑商品 -->
   <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
-    <el-form :model="formData" label-width="80px" ref="formRef" @submit.prevent>
+    <el-form :model="formData" label-width="80px" @submit.prevent>
       <el-form-item label="商品名称" required>
         <el-input
           v-model="formData.name"
@@ -523,38 +520,79 @@
   </el-dialog>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { useDashboard } from './composables/useDashboard';
-import { useTable } from './composables/useTable';
-import { Product, FormData } from './types';
 
-// 使用 Composables
-const { statCards, alerts, chartPeriod } = useDashboard();
-const {
-  tableData,
-  paginatedData,
-  loading,
-  searchQuery,
-  searchCategory,
-  currentPage,
-  pageSize,
-  handleSearch,
-  resetSearch,
-  handleDelete,
-  handlePageChange,
-} = useTable();
+// 工作台数据
+const statCards = ref([
+  { title: '总商品数', value: '1240', icon: 'Goods', colorClass: 'bg-blue-100 text-blue-500' },
+  { title: '今日入库', value: '86', icon: 'Download', colorClass: 'bg-green-100 text-green-500' },
+  { title: '今日出库', value: '52', icon: 'Upload', colorClass: 'bg-orange-100 text-orange-500' },
+  { title: '库存预警', value: '18', icon: 'Warning', colorClass: 'bg-red-100 text-red-500' },
+]);
+
+const alerts = ref([
+  { id: 1, type: 'danger', tag: '预警', content: '笔记本电脑库存不足（剩余15）', time: '10分钟前' },
+  { id: 2, type: 'warning', tag: '提醒', content: '采购订单 #PO20260320 待审核', time: '1小时前' },
+  { id: 3, type: 'success', tag: '完成', content: '出库单 #OUT20260324 已完成', time: '2小时前' },
+]);
+
+const chartPeriod = ref('week');
+
+// 表格数据
+const tableData = ref([
+  { id: 1, name: '笔记本电脑', sku: 'SKU-001', category: '电子产品', price: 4999, stock: 15, status: true, image: 'https://via.placeholder.com/40' },
+  { id: 2, name: '办公椅', sku: 'SKU-002', category: '家居用品', price: 299, stock: 68, status: true, image: 'https://via.placeholder.com/40' },
+  { id: 3, name: 'A4打印纸', sku: 'SKU-003', category: '办公耗材', price: 59.9, stock: 200, status: true, image: 'https://via.placeholder.com/40' },
+]);
+
+const loading = ref(false);
+const searchQuery = ref('');
+const searchCategory = ref('');
+const currentPage = ref(1);
+const pageSize = ref(10);
+
+const filteredTableData = computed(() => {
+  return tableData.value.filter(item => {
+    const matchQuery = item.name.includes(searchQuery.value) || item.sku.includes(searchQuery.value);
+    const matchCategory = searchCategory.value ? item.category === searchCategory.value : true;
+    return matchQuery && matchCategory;
+  });
+});
+
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  return filteredTableData.value.slice(start, start + pageSize.value);
+});
+
+const handleSearch = () => {};
+const resetSearch = () => {
+  searchQuery.value = '';
+  searchCategory.value = '';
+};
+
+const handleDelete = (row) => {
+  ElMessageBox.confirm('确认删除该商品？', '提示', {
+    type: 'warning'
+  }).then(() => {
+    tableData.value = tableData.value.filter(item => item.id !== row.id);
+    ElMessage.success('删除成功');
+  });
+};
+
+const handlePageChange = (page) => {
+  currentPage.value = page;
+};
 
 // UI 状态
 const isCollapse = ref(false);
 const activeMenu = ref('dashboard');
 const dialogVisible = ref(false);
-const dialogType = ref<'add' | 'edit'>('add');
+const dialogType = ref('add');
 const saving = ref(false);
 
-// 表单���据
-const formData = ref<FormData>({
+const formData = ref({
   name: '',
   sku: '',
   category: '',
@@ -563,9 +601,8 @@ const formData = ref<FormData>({
   status: true,
 });
 
-// 计算属性
 const currentBreadcrumb = computed(() => {
-  const breadcrumbMap: Record<string, string> = {
+  const map = {
     dashboard: '工作台',
     'stock-list': '库存列表',
     'stock-check': '库存盘点',
@@ -573,15 +610,12 @@ const currentBreadcrumb = computed(() => {
     outbound: '出库管理',
     settings: '系统设置',
   };
-  return breadcrumbMap[activeMenu.value] || '首页';
+  return map[activeMenu.value] || '首页';
 });
 
-const dialogTitle = computed(() =>
-  dialogType.value === 'add' ? '新增商品' : '编辑商品'
-);
+const dialogTitle = computed(() => dialogType.value === 'add' ? '新增商品' : '编辑商品');
 
-// 防抖搜索
-let searchTimer: NodeJS.Timeout;
+let searchTimer = null;
 const debounceSearch = () => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => {
@@ -589,29 +623,18 @@ const debounceSearch = () => {
   }, 500);
 };
 
-// 切换侧边栏
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value;
 };
 
-// 菜单选择
-const handleMenuSelect = (key: string) => {
+const handleMenuSelect = (key) => {
   activeMenu.value = key;
 };
 
-// 打开对话框
-const openDialog = (type: 'add' | 'edit', row?: Product) => {
+const openDialog = (type, row) => {
   dialogType.value = type;
   if (type === 'edit' && row) {
-    formData.value = {
-      id: row.id,
-      name: row.name,
-      sku: row.sku,
-      category: row.category,
-      stock: row.stock,
-      price: row.price,
-      status: row.status,
-    };
+    formData.value = { ...row };
   } else {
     formData.value = {
       name: '',
@@ -625,91 +648,50 @@ const openDialog = (type: 'add' | 'edit', row?: Product) => {
   dialogVisible.value = true;
 };
 
-// 保存数据
 const saveData = async () => {
-  // 表单验证
-  if (!formData.value.name.trim()) {
-    ElMessage.error('请输入商品名称');
-    return;
-  }
-  if (!formData.value.sku.trim()) {
-    ElMessage.error('请输入SKU编号');
-    return;
-  }
-  if (!formData.value.category) {
-    ElMessage.error('请选择商品分类');
-    return;
-  }
-  if (!formData.value.price) {
-    ElMessage.error('请输入单价');
-    return;
-  }
+  if (!formData.value.name) { ElMessage.error('请输入商品名称'); return; }
+  if (!formData.value.sku) { ElMessage.error('请输入SKU'); return; }
+  if (!formData.value.category) { ElMessage.error('请选择分类'); return; }
 
   saving.value = true;
   try {
-    // 模拟 API 请求
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
+    await new Promise(resolve => setTimeout(resolve, 500));
     if (dialogType.value === 'add') {
-      // 新增
-      const newProduct: Product = {
-        id: Math.max(...tableData.value.map((p) => p.id), 0) + 1,
-        name: formData.value.name,
-        sku: formData.value.sku,
-        category: formData.value.category,
+      const newId = Math.max(...tableData.value.map(p => p.id), 0) + 1;
+      tableData.value.push({
+        ...formData.value,
+        id: newId,
         price: Number(formData.value.price),
-        stock: formData.value.stock,
-        status: formData.value.status,
-        image: 'https://via.placeholder.com/40',
-      };
-      tableData.value.push(newProduct);
-      ElMessage.success('新增商品成功');
+        image: 'https://via.placeholder.com/40'
+      });
+      ElMessage.success('新增成功');
     } else {
-      // 编辑
-      const index = tableData.value.findIndex((p) => p.id === formData.value.id);
+      const index = tableData.value.findIndex(p => p.id === formData.value.id);
       if (index !== -1) {
         tableData.value[index] = {
-          ...tableData.value[index],
-          name: formData.value.name,
-          sku: formData.value.sku,
-          category: formData.value.category,
+          ...formData.value,
           price: Number(formData.value.price),
-          stock: formData.value.stock,
-          status: formData.value.status,
+          image: 'https://via.placeholder.com/40'
         };
-        ElMessage.success('编辑商品成功');
+        ElMessage.success('编辑成功');
       }
     }
-
     dialogVisible.value = false;
   } finally {
     saving.value = false;
   }
 };
 
-// 退出登录
 const handleLogout = () => {
-  ElMessageBox.confirm('确定要退出登录吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  })
-    .then(() => {
-      ElMessage.success('退出登录成功');
-      // 这里可以调用退出登录 API
-    })
-    .catch(() => {
-      // 用户取消
-    });
+  ElMessageBox.confirm('确定退出登录？', '提示', { type: 'warning' })
+    .then(() => ElMessage.success('退出成功'));
 };
 
-// 监听搜索条件变化时重置分页
 watch([searchQuery, searchCategory], () => {
   currentPage.value = 1;
 });
 
 onMounted(() => {
-  // 页面初始化逻辑
-  console.log('Dashboard 组件���加载');
+  console.log('页面已加载');
 });
 </script>
