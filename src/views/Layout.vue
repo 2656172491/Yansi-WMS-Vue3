@@ -102,10 +102,10 @@ const route = useRoute()
 
 const sidebarMenus = [
   {
-    index: 'dashboard',
+    index: 'workbench',
     title: '工作台',
     icon: Odometer,
-    path: '/home/dashboard',
+    path: '/home/workbench',
   },
   {
     index: 'inventory',
@@ -135,7 +135,7 @@ const activeMenu = computed(() => {
   for (const [key, routePath] of Object.entries(menuRouteMap)) {
     if (path.startsWith(routePath)) return key
   }
-  return 'dashboard'
+  return 'workbench'
 })
 
 const currentBreadcrumb = computed(() => route.meta?.title || '工作台')

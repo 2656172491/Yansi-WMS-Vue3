@@ -7,11 +7,11 @@ const routes = [
   {
     path: '/home',
     component: Layout,
-    redirect: '/home/dashboard',
+    redirect: '/home/workbench',
     children: [
       {
-        path: 'dashboard',
-        component: () => import('../views/dashboard/Dashboard.vue'),
+        path: 'workbench',
+        component: () => import('../views/workbench/Workbench.vue'),
         meta: { title: '工作台' },
       },
       {
