@@ -19,30 +19,27 @@
         :collapse="isCollapse"
         @select="handleMenuSelect"
       >
-        <el-menu-item index="dashboard">
-          <el-icon><Odometer /></el-icon>
-          <template #title>工作台</template>
-        </el-menu-item>
-        <el-sub-menu index="inventory">
-          <template #title>
-            <el-icon><Goods /></el-icon>
-            <span>库存管理</span>
-          </template>
-          <el-menu-item index="stock-list">库存列表</el-menu-item>
-          <el-menu-item index="stock-check">库存盘点</el-menu-item>
-        </el-sub-menu>
-        <el-menu-item index="inbound">
-          <el-icon><Download /></el-icon>
-          <template #title>入库管理</template>
-        </el-menu-item>
-        <el-menu-item index="outbound">
-          <el-icon><Upload /></el-icon>
-          <template #title>出库管理</template>
-        </el-menu-item>
-        <el-menu-item index="settings">
-          <el-icon><Setting /></el-icon>
-          <template #title>系统设置</template>
-        </el-menu-item>
+        <template v-for="item in sidebarMenus" :key="item.index">
+          <el-sub-menu v-if="item.children" :index="item.index">
+            <template #title>
+              <el-icon><component :is="item.icon" /></el-icon>
+              <span>{{ item.title }}</span>
+            </template>
+
+            <el-menu-item
+              v-for="child in item.children"
+              :key="child.index"
+              :index="child.index"
+            >
+              {{ child.title }}
+            </el-menu-item>
+          </el-sub-menu>
+
+          <el-menu-item v-else :index="item.index">
+            <el-icon><component :is="item.icon" /></el-icon>
+            <template #title>{{ item.title }}</template>
+          </el-menu-item>
+        </template>
       </el-menu>
     </el-aside>
 
@@ -97,19 +94,76 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  ElMessage,
+  ElMessageBox,
+} from 'element-plus'
+import {
+  Box,
+  Odometer,
+  Goods,
+  Download,
+  Upload,
+  Setting,
+} from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
 
-const menuRouteMap = {
-  'dashboard': '/home/dashboard',
-  'stock-list': '/home/inventory/stock-list',
-  'stock-check': '/home/inventory/stock-check',
-  'inbound': '/home/inbound',
-  'outbound': '/home/outbound',
-  'settings': '/home/settings',
+const sidebarMenus = [
+  {
+    index: 'dashboard',
+    title: '工作台',
+    icon: Odometer,
+    path: '/home/dashboard',
+  },
+  {
+    index: 'inventory',
+    title: '库存管理',
+    icon: Goods,
+    children: [
+      {
+        index: 'stock-list',
+        title: '库存列表',
+        path: '/home/inventory/stock-list',
+      },
+      {
+        index: 'stock-check',
+        title: '库存盘点',
+        path: '/home/inventory/stock-check',
+      },
+    ],
+  },
+  {
+    index: 'inbound',
+    title: '入库管理',
+    icon: Download,
+    path: '/home/inbound',
+  },
+  {
+    index: 'outbound',
+    title: '出库管理',
+    icon: Upload,
+    path: '/home/outbound',
+  },
+  {
+    index: 'settings',
+    title: '系统设置',
+    icon: Setting,
+    path: '/home/settings',
+  },
+]
+
+const menuRouteMap = {}
+
+const buildMenuRouteMap = (menus) => {
+  menus.forEach((item) => {
+    if (item.path) menuRouteMap[item.index] = item.path
+    if (item.children) buildMenuRouteMap(item.children)
+  })
 }
+
+buildMenuRouteMap(sidebarMenus)
 
 // 根据当前路由路径推导激活菜单项
 const activeMenu = computed(() => {
