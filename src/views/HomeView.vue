@@ -528,7 +528,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useDashboard } from './composables/useDashboard';
 import { useTable } from './composables/useTable';
-import type { Product, FormData } from './types';
+import { Product, FormData } from './types';
 
 // 使用 Composables
 const { statCards, alerts, chartPeriod } = useDashboard();
