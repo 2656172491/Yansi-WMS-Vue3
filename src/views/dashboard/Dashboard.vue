@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-full">
     <StatsCard :cards="statCards" />
     <el-row :gutter="20">
       <el-col :span="16">

@@ -1,7 +1,7 @@
 <template>
-  <el-container style="height: 100vh">
+  <el-container style="height: 100vh; margin: 0; padding: 0">
     <!-- 侧边栏 -->
-    <el-aside width="auto" style="background-color: #304156">
+    <el-aside width="auto" style="background-color: #304156; height: 100vh">
       <div class="logo-container" v-if="!isCollapse">
         <el-icon class="logo-icon"><Box /></el-icon>
         <span>言寺 WMS</span>
@@ -11,13 +11,13 @@
       </div>
 
       <el-menu
-        :default-active="activeMenu"
-        class="aside-menu"
-        background-color="#304156"
-        text-color="#bfcbd9"
-        active-text-color="#409EFF"
-        :collapse="isCollapse"
-        @select="handleMenuSelect"
+          :default-active="activeMenu"
+          class="aside-menu"
+          background-color="#304156"
+          text-color="#bfcbd9"
+          active-text-color="#409EFF"
+          :collapse="isCollapse"
+          @select="handleMenuSelect"
       >
         <template v-for="item in sidebarMenus" :key="item.index">
           <el-sub-menu v-if="item.children" :index="item.index">
@@ -27,9 +27,9 @@
             </template>
 
             <el-menu-item
-              v-for="child in item.children"
-              :key="child.index"
-              :index="child.index"
+                v-for="child in item.children"
+                :key="child.index"
+                :index="child.index"
             >
               {{ child.title }}
             </el-menu-item>
@@ -43,13 +43,13 @@
       </el-menu>
     </el-aside>
 
-    <el-container>
+    <el-container style="height: 100vh">
       <!-- 顶部 Header -->
       <el-header class="header-container">
         <div class="flex items-center">
           <el-icon
-            class="cursor-pointer text-xl text-gray-600 hover:text-blue-500 mr-4"
-            @click="isCollapse = !isCollapse"
+              class="cursor-pointer text-xl text-gray-600 hover:text-blue-500 mr-4"
+              @click="isCollapse = !isCollapse"
           >
             <component :is="isCollapse ? 'Expand' : 'Fold'" />
           </el-icon>
@@ -66,16 +66,16 @@
           <el-dropdown trigger="click">
             <span class="el-dropdown-link flex items-center cursor-pointer text-gray-700">
               <el-avatar
-                :size="32"
-                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-                class="mr-2"
+                  :size="32"
+                  src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                  class="mr-2"
               />
               管理员
               <el-icon class="el-icon--right"><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="router.push('/home/personal-center')">个人中心</el-dropdown-item>
+                <el-dropdown-item>个人中心</el-dropdown-item>
                 <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -94,18 +94,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import {
-  ElMessage,
-  ElMessageBox,
-} from 'element-plus'
-import {
-  Box,
-  Odometer,
-  Goods,
-  Download,
-  Upload,
-  Setting,
-} from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {Box, Odometer, Goods, Download, Upload, Setting, ArrowDown, Bell} from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -122,50 +112,24 @@ const sidebarMenus = [
     title: '库存管理',
     icon: Goods,
     children: [
-      {
-        index: 'stock-list',
-        title: '库存列表',
-        path: '/home/inventory/stock-list',
-      },
-      {
-        index: 'stock-check',
-        title: '库存盘点',
-        path: '/home/inventory/stock-check',
-      },
+      { index: 'stock-list', title: '库存列表', path: '/home/inventory/stock-list' },
+      { index: 'stock-check', title: '库存盘点', path: '/home/inventory/stock-check' },
     ],
   },
-  {
-    index: 'inbound',
-    title: '入库管理',
-    icon: Download,
-    path: '/home/inbound',
-  },
-  {
-    index: 'outbound',
-    title: '出库管理',
-    icon: Upload,
-    path: '/home/outbound',
-  },
-  {
-    index: 'settings',
-    title: '系统设置',
-    icon: Setting,
-    path: '/home/settings',
-  },
+  { index: 'inbound', title: '入库管理', icon: Download, path: '/home/inbound' },
+  { index: 'outbound', title: '出库管理', icon: Upload, path: '/home/outbound' },
+  { index: 'settings', title: '系统设置', icon: Setting, path: '/home/settings' },
 ]
 
 const menuRouteMap = {}
-
 const buildMenuRouteMap = (menus) => {
   menus.forEach((item) => {
     if (item.path) menuRouteMap[item.index] = item.path
     if (item.children) buildMenuRouteMap(item.children)
   })
 }
-
 buildMenuRouteMap(sidebarMenus)
 
-// 根据当前路由路径推导激活菜单项
 const activeMenu = computed(() => {
   const path = route.path
   for (const [key, routePath] of Object.entries(menuRouteMap)) {
@@ -175,8 +139,6 @@ const activeMenu = computed(() => {
 })
 
 const currentBreadcrumb = computed(() => route.meta?.title || '工作台')
-
-// UI 状态
 const isCollapse = ref(false)
 
 const handleMenuSelect = (key) => {
@@ -186,8 +148,12 @@ const handleMenuSelect = (key) => {
 
 const handleLogout = () => {
   ElMessageBox.confirm('确定退出登录？', '提示', { type: 'warning' })
-    .then(() => ElMessage.success('退出成功'))
-    .catch(() => {})
+      .then(() => {
+        localStorage.clear()
+        router.push('/login')
+        ElMessage.success('退出成功')
+      })
+      .catch(() => {})
 }
 </script>
 
@@ -221,5 +187,7 @@ const handleLogout = () => {
 .main-container {
   padding: 20px;
   background-color: #f5f7fa;
+  height: calc(100vh - 60px);
+  overflow: auto;
 }
 </style>

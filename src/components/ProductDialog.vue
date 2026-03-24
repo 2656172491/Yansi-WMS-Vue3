@@ -18,7 +18,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="初始库存" prop="stock">
-        <el-input-number v-model="localForm.stock" :min="0" />
+        <el-input-number v-model="localForm.stock" :min="0"/>
       </el-form-item>
       <el-form-item label="单价" prop="price">
         <el-input v-model="localForm.price" placeholder="0.00">
@@ -30,7 +30,7 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="handleClose">取消</el-button>
+      <el-button @click="handleClose">取消</el-button>a
       <el-button type="primary" :loading="saving" @click="handleConfirm">确认</el-button>
     </template>
   </el-dialog>

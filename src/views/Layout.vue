@@ -1,16 +1,17 @@
 <template>
-  <el-container style="height: 100vh">
+  <el-container style="height: 100vh; width: 100vw; margin: 0; padding: 0;">
     <Sidebar :collapse="isCollapse" />
 
-    <el-container>
+    <el-container style="margin: 0; padding: 0; flex-direction: column;">
       <Header
-        :collapse="isCollapse"
-        :breadcrumb="currentBreadcrumb"
-        :alert-count="alertCount"
-        @toggle-collapse="isCollapse = !isCollapse"
+          :collapse="isCollapse"
+          :breadcrumb="currentBreadcrumb"
+          :alert-count="alertCount"
+          @toggle-collapse="isCollapse = !isCollapse"
+          style="width: 100%; margin: 0; padding: 0;"
       />
 
-      <el-main class="main-container">
+      <el-main class="main-container" style="flex: 1; padding: 20px; background-color: #f5f7fa; overflow-y: auto;">
         <router-view />
       </el-main>
     </el-container>
@@ -31,9 +32,8 @@ const currentBreadcrumb = computed(() => route.meta?.title || '统计概览')
 </script>
 
 <style scoped>
+/* 样式保持简洁，避免干扰 */
 .main-container {
-  padding: 20px;
-  background-color: #f5f7fa;
-  overflow-y: auto;
+  flex: 1;
 }
 </style>
