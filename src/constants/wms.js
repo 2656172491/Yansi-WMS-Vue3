@@ -7,6 +7,32 @@ export const CATEGORIES = [
   { label: '办公耗材', value: '办公耗材' },
 ]
 
+/** 订单状态 */
+export const ORDER_STATUS = {
+  PENDING: { value: 'pending', label: '待处理', type: 'info' },
+  PROCESSING: { value: 'processing', label: '处理中', type: 'warning' },
+  SHIPPED: { value: 'shipped', label: '已发货', type: 'primary' },
+  COMPLETED: { value: 'completed', label: '已完成', type: 'success' },
+  CANCELLED: { value: 'cancelled', label: '已取消', type: 'danger' },
+}
+
+/** 库存状态 */
+export const INVENTORY_STATUS = {
+  NORMAL: { value: 'normal', label: '正常', type: 'success' },
+  LOW: { value: 'low', label: '库存不足', type: 'warning' },
+  OUT: { value: 'out', label: '缺货', type: 'danger' },
+  OVERSTOCKED: { value: 'overstocked', label: '积压', type: 'info' },
+}
+
+/** 出入库操作类型 */
+export const OPERATION_TYPES = {
+  IN: { value: 'in', label: '入库', icon: 'Download' },
+  OUT: { value: 'out', label: '出库', icon: 'Upload' },
+  CHECK: { value: 'check', label: '盘点', icon: 'DataAnalysis' },
+  TRANSFER: { value: 'transfer', label: '调拨', icon: 'Sort' },
+  RETURN: { value: 'return', label: '退库', icon: 'RefreshLeft' },
+}
+
 /** 面包屑导航映射 */
 export const MENU_BREADCRUMB_MAP = {
   dashboard: '工作台',
