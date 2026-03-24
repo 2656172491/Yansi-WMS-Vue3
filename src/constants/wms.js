@@ -1,24 +1,40 @@
-// src/constants/wms.js
+// src/constants/wms.js — WMS 全局常量配置
 
-export const CATEGORIES = {
-    CATEGORY_A: 'Category A',
-    CATEGORY_B: 'Category B',
-    CATEGORY_C: 'Category C',
-};
+/** 商品分类选项 */
+export const CATEGORIES = [
+  { label: '电子产品', value: '电子产品' },
+  { label: '家居用品', value: '家居用品' },
+  { label: '办公耗材', value: '办公耗材' },
+]
 
-export const MENU_ITEMS = [
-    { label: 'Home', path: '/' },
-    { label: 'About', path: '/about' },
-    { label: 'Contact', path: '/contact' },
-];
+/** 面包屑导航映射 */
+export const MENU_BREADCRUMB_MAP = {
+  dashboard: '工作台',
+  'stock-list': '库存列表',
+  'stock-check': '库存盘点',
+  inbound: '入库管理',
+  outbound: '出库管理',
+  settings: '系统设置',
+}
 
-export const ALERT_TYPES = {
-    SUCCESS: 'success',
-    ERROR: 'error',
-    WARNING: 'warning',
-};
+/** 统计卡片配置 */
+export const STAT_CARDS_CONFIG = [
+  { title: '总商品数', value: '1240', icon: 'Goods', colorClass: 'bg-blue-100 text-blue-500' },
+  { title: '今日入库', value: '86', icon: 'Download', colorClass: 'bg-green-100 text-green-500' },
+  { title: '今日出库', value: '52', icon: 'Upload', colorClass: 'bg-orange-100 text-orange-500' },
+  { title: '库存预警', value: '18', icon: 'Warning', colorClass: 'bg-red-100 text-red-500' },
+]
 
-export const STAT_CARDS = [
-    { title: 'Total Users', value: 1000 },
-    { title: 'Active Sessions', value: 300 },
-];
+/** 预警数据（Mock） */
+export const MOCK_ALERTS = [
+  { id: 1, type: 'danger', tag: '预警', content: '笔记本电脑库存不足（剩余15）', time: '10分钟前' },
+  { id: 2, type: 'warning', tag: '提醒', content: '采购订单 #PO20260320 待审核', time: '1小时前' },
+  { id: 3, type: 'success', tag: '完成', content: '出库单 #OUT20260324 已完成', time: '2小时前' },
+]
+
+/** 商品表格初始数据（Mock） */
+export const MOCK_TABLE_DATA = [
+  { id: 1, name: '笔记本电脑', sku: 'SKU-001', category: '电子产品', price: 4999, stock: 15, status: true, image: 'https://via.placeholder.com/40' },
+  { id: 2, name: '办公椅', sku: 'SKU-002', category: '家居用品', price: 299, stock: 68, status: true, image: 'https://via.placeholder.com/40' },
+  { id: 3, name: 'A4打印纸', sku: 'SKU-003', category: '办公耗材', price: 59.9, stock: 200, status: true, image: 'https://via.placeholder.com/40' },
+]

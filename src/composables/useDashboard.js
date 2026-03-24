@@ -1,12 +1,10 @@
-export const statCards = [
-    { title: 'Total Users', value: 150 },
-    { title: 'Active Projects', value: 37 },
-    { title: 'Pending Tasks', value: 19 }
-];
+import { ref } from 'vue'
+import { STAT_CARDS_CONFIG, MOCK_ALERTS } from '@/constants/wms.js'
 
-export const chartPeriod = 'monthly';
+export function useDashboard() {
+  const statCards = ref([...STAT_CARDS_CONFIG])
+  const alerts = ref([...MOCK_ALERTS])
+  const chartPeriod = ref('week')
 
-export const alerts = [
-    { message: 'Server downtime', type: 'error' },
-    { message: 'New user signup', type: 'success' }
-];
+  return { statCards, alerts, chartPeriod }
+}
