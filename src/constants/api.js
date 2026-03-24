@@ -11,7 +11,41 @@ export const API_ENDPOINTS = {
     LOGOUT: '/api/auth/logout',
     REFRESH: '/api/auth/refresh-token',
     ME: '/api/auth/me',
+    USER_INFO: '/api/auth/userInfo',
     PERMISSIONS: '/api/auth/permissions',
+  },
+  GOODS: {
+    LIST: '/api/goods/list',
+    DETAIL: (id) => `/api/goods/${id}`,
+    CREATE: '/api/goods',
+    UPDATE: (id) => `/api/goods/${id}`,
+    DELETE: (id) => `/api/goods/${id}`,
+  },
+  CATEGORY: {
+    LIST: '/api/category/list',
+    CREATE: '/api/category',
+    UPDATE: (id) => `/api/category/${id}`,
+    DELETE: (id) => `/api/category/${id}`,
+  },
+  INVENTORY: {
+    LIST: '/api/inventory/list',
+    DETAIL: (id) => `/api/inventory/${id}`,
+    INBOUND: '/api/inventory/inbound',
+    OUTBOUND: '/api/inventory/outbound',
+    CHECK: '/api/inventory/check',
+    ALERTS: '/api/inventory/alerts',
+    // legacy aliases kept for backward compatibility
+    IN: '/api/inventory/inbound',
+    OUT: '/api/inventory/outbound',
+  },
+  RECORD: {
+    LIST: '/api/record/list',
+  },
+  STATISTICS: {
+    OVERVIEW: '/api/statistics/overview',
+    TREND: '/api/statistics/trend',
+    CATEGORY: '/api/statistics/category',
+    INVENTORY_REPORT: '/api/statistics/inventory',
   },
   PRODUCTS: {
     LIST: '/api/products',
@@ -20,14 +54,6 @@ export const API_ENDPOINTS = {
     UPDATE: (id) => `/api/products/${id}`,
     DELETE: (id) => `/api/products/${id}`,
     CATEGORIES: '/api/products/categories',
-  },
-  INVENTORY: {
-    LIST: '/api/inventory',
-    DETAIL: (id) => `/api/inventory/${id}`,
-    IN: '/api/inventory/in',
-    OUT: '/api/inventory/out',
-    CHECK: '/api/inventory/check',
-    ALERTS: '/api/inventory/alerts',
   },
   ORDERS: {
     LIST: '/api/orders',

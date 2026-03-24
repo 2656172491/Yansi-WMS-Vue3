@@ -7,6 +7,18 @@ export const CATEGORIES = [
   { label: '办公耗材', value: '办公耗材' },
 ]
 
+/** 物资状态 */
+export const GOODS_STATUS = {
+  ENABLED: 1,
+  DISABLED: 0,
+}
+
+/** 出入库类型 */
+export const RECORD_TYPE = {
+  IN: 1,
+  OUT: 2,
+}
+
 /** 订单状态 */
 export const ORDER_STATUS = {
   PENDING: { value: 'pending', label: '待处理', type: 'info' },
@@ -16,10 +28,11 @@ export const ORDER_STATUS = {
   CANCELLED: { value: 'cancelled', label: '已取消', type: 'danger' },
 }
 
-/** 库存状态 */
+/** 库存预警状态 */
 export const INVENTORY_STATUS = {
   NORMAL: { value: 'normal', label: '正常', type: 'success' },
   LOW: { value: 'low', label: '库存不足', type: 'warning' },
+  HIGH: { value: 'high', label: '库存过多', type: 'info' },
   OUT: { value: 'out', label: '缺货', type: 'danger' },
   OVERSTOCKED: { value: 'overstocked', label: '积压', type: 'info' },
 }
@@ -32,6 +45,10 @@ export const OPERATION_TYPES = {
   TRANSFER: { value: 'transfer', label: '调拨', icon: 'Sort' },
   RETURN: { value: 'return', label: '退库', icon: 'RefreshLeft' },
 }
+
+/** 分页默认值 */
+export const DEFAULT_PAGE = 1
+export const DEFAULT_PAGE_SIZE = 10
 
 /** 面包屑导航映射 */
 export const MENU_BREADCRUMB_MAP = {

@@ -7,3 +7,5 @@ export const pinia = createPinia()
 
 export { useAuthStore } from './authStore'
 export { useAppStore } from './appStore'
+export { useGoodsStore } from './goodsStore'
+export { useInventoryStore } from './inventoryStore'
