@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
 import Layout from '../views/Layout.vue'
 import { isLoggedIn } from '../utils/auth.js'
+import Home from "@/views/Home.vue";
 
 const routes = [
   { path: '/login', component: Login },
@@ -9,8 +10,13 @@ const routes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/statistics/dashboard', // 默认首页
+    redirect: '/home', // 默认首页
     children: [
+      {
+        path: 'home',
+        component: Home,
+        meta: { title: '首页' },
+      },
       // ==========================
       // 1. 统计概览（一级目录）
       // ==========================
@@ -22,7 +28,7 @@ const routes = [
           {
             path: 'dashboard', // 简写，不用写全路径
             component: () => import('../views/statistics/Dashboard.vue'),
-            meta: { title: '数据看板' },
+            meta: { title: '工作台' },
           },
         ]
       },

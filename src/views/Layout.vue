@@ -2,7 +2,7 @@
   <el-container style="height: 100vh">
     <!-- 侧边栏 -->
     <el-aside width="auto" style="background-color: #304156">
-      <div class="logo-container" v-if="!isCollapse">
+      <div class="logo-container" v-if="!isCollapse" @click="router.push('/')">
         <el-icon class="logo-icon"><Box /></el-icon>
         <span>言寺 WMS</span>
       </div>
@@ -17,6 +17,7 @@
           text-color="#bfcbd9"
           active-text-color="#409EFF"
           :collapse="isCollapse"
+          unique-opened="true"
           @select="handleMenuSelect"
       >
         <template v-for="item in sidebarMenus" :key="item.index">
@@ -54,7 +55,6 @@
             <component :is="isCollapse ? 'Expand' : 'Fold'" />
           </el-icon>
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item>首页</el-breadcrumb-item>
             <el-breadcrumb-item>{{ currentBreadcrumb }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
@@ -102,9 +102,7 @@ import {
   Box,
   Odometer,
   Goods,
-  Download,
-  Upload,
-  Setting, ArrowDown, Bell, MessageBox,
+  Setting, ArrowDown, Bell
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -120,7 +118,7 @@ const sidebarMenus = [
   {
     index: 'inventory',
     title: '库存管理',
-    icon: MessageBox,
+    icon: Box,
     children: [
       {
         index: 'stock-list',
@@ -130,13 +128,11 @@ const sidebarMenus = [
       {
         index: 'inbound',
         title: '入库管理',
-        icon: Download,
         path: '/inventory/inbound',
       },
       {
         index: 'outbound',
         title: '出库管理',
-        icon: Upload,
         path: '/inventory/outbound',
       },
       {
@@ -186,39 +182,47 @@ const sidebarMenus = [
   },
 ]
 
+// 建立菜单 index => path 的映射表
 const menuRouteMap = {}
-
 const buildMenuRouteMap = (menus) => {
   menus.forEach((item) => {
-    if (item.path) menuRouteMap[item.index] = item.path
+    if (item.path) menuRouteMap[item.path] = item.index
     if (item.children) buildMenuRouteMap(item.children)
   })
 }
-
 buildMenuRouteMap(sidebarMenus)
 
-// 根据当前路由路径推导激活菜单项
+// 计算当前激活的菜单 —— 修复完成
 const activeMenu = computed(() => {
   const path = route.path
-  for (const [key, routePath] of Object.entries(menuRouteMap)) {
-    if (path.startsWith(routePath)) return key
+  if (menuRouteMap[path]) return menuRouteMap[path]
+
+  // 次级菜单匹配 /setting、/inventory 等
+  for (const pathKey of Object.keys(menuRouteMap)) {
+    if (path.startsWith(pathKey)) return menuRouteMap[pathKey]
   }
-  return 'dashboard'
+
+  // 不在菜单里的页面：个人中心 / 404 等 → 不高亮任何菜单
+  return ''
 })
 
-const currentBreadcrumb = computed(() => route.meta?.title || '工作台')
+// 面包屑
+const currentBreadcrumb = computed(() => route.meta?.title || '页面')
 
 // UI 状态
 const isCollapse = ref(false)
 
 const handleMenuSelect = (key) => {
-  const target = menuRouteMap[key]
-  if (target) router.push(target)
+  const path = Object.keys(menuRouteMap).find(p => menuRouteMap[p] === key)
+  if (path) router.push(path)
 }
 
 const handleLogout = () => {
   ElMessageBox.confirm('确定退出登录？', '提示', { type: 'warning' })
-      .then(() => ElMessage.success('退出成功'))
+      .then(() => {
+        ElMessage.success('退出成功')
+        router.push('/login')
+      })
       .catch(() => {})
 }
 </script>
