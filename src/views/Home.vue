@@ -87,36 +87,6 @@
         </el-col>
       </el-row>
     </el-card>
-
-    <!-- 图表区域 -->
-    <el-row :gutter="16" class="section-row">
-      <el-col :xs="24" :md="16">
-        <el-card class="section-card chart-card" shadow="never">
-          <template #header>
-            <div class="section-header">
-              <span>出入库趋势</span>
-              <el-radio-group v-model="trendPeriod" size="small" @change="loadTrendData">
-                <el-radio-button label="week">近7天</el-radio-button>
-                <el-radio-button label="month">近30天</el-radio-button>
-              </el-radio-group>
-            </div>
-          </template>
-          <div ref="trendChartRef" class="chart-box"></div>
-        </el-card>
-      </el-col>
-
-      <el-col :xs="24" :md="8">
-        <el-card class="section-card chart-card" shadow="never">
-          <template #header>
-            <div class="section-header">
-              <span>分类占比</span>
-            </div>
-          </template>
-          <div ref="categoryChartRef" class="chart-box"></div>
-        </el-card>
-      </el-col>
-    </el-row>
-
     <!-- 底部信息 -->
     <el-row :gutter="16" class="section-row">
       <el-col :xs="24" :md="12">
@@ -170,11 +140,10 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import * as echarts from 'echarts'
-import { Box, Goods, Download, Upload, List, Bell, } from '@element-plus/icons-vue'
-import { getOverview, getTrend, getCategoryStats } from '@/api/statistics.js'
+import { Box, Goods, Download, Upload, List, Bell } from '@element-plus/icons-vue'
+import { getOverview } from '@/api/statistics.js'
 import { useAuthStore } from '@/store/index.js'
 
 const router = useRouter()
@@ -246,13 +215,7 @@ const activities = ref([
   { id: 4, type: 'info', content: '系统数据同步完成', time: '今天 12:00' },
 ])
 
-const trendPeriod = ref('week')
-
-const trendChartRef = ref(null)
-const categoryChartRef = ref(null)
-let trendChart = null
-let categoryChart = null
-
+// 加载概览数据
 const loadOverviewData = async () => {
   const res = await getOverview()
   const d = res.data
@@ -269,99 +232,13 @@ const loadOverviewData = async () => {
   ]
 }
 
-const initTrendChart = (data) => {
-  if (!trendChartRef.value) return
-  if (!trendChart) trendChart = echarts.init(trendChartRef.value)
-
-  trendChart.setOption({
-    tooltip: { trigger: 'axis' },
-    grid: { left: 30, right: 20, top: 30, bottom: 30, containLabel: true },
-    xAxis: {
-      type: 'category',
-      data: data.labels || [],
-      axisLine: { lineStyle: { color: '#dcdfe6' } },
-    },
-    yAxis: {
-      type: 'value',
-      axisLine: { lineStyle: { color: '#dcdfe6' } },
-      splitLine: { lineStyle: { color: '#f2f3f5' } },
-    },
-    series: [
-      {
-        name: '入库',
-        type: 'line',
-        smooth: true,
-        data: data.inbound || [],
-        itemStyle: { color: '#67c23a' },
-        areaStyle: { opacity: 0.08 },
-      },
-      {
-        name: '出库',
-        type: 'line',
-        smooth: true,
-        data: data.outbound || [],
-        itemStyle: { color: '#e6a23c' },
-        areaStyle: { opacity: 0.08 },
-      },
-    ],
-  })
-}
-
-const initCategoryChart = (data) => {
-  if (!categoryChartRef.value) return
-  if (!categoryChart) categoryChart = echarts.init(categoryChartRef.value)
-
-  categoryChart.setOption({
-    tooltip: { trigger: 'item' },
-    legend: { bottom: 0, left: 'center' },
-    series: [
-      {
-        type: 'pie',
-        radius: ['45%', '70%'],
-        avoidLabelOverlap: false,
-        data: data.map((item) => ({
-          name: item.name,
-          value: item.value,
-        })),
-      },
-    ],
-  })
-}
-
-const loadTrendData = async () => {
-  const res = await getTrend({ period: trendPeriod.value })
-  initTrendChart(res.data)
-}
-
-const loadCategoryData = async () => {
-  const res = await getCategoryStats()
-  initCategoryChart(res.data)
-}
-
+// 路由跳转
 const handleNavigate = (path) => {
   router.push(path)
 }
 
-const handleResize = () => {
-  trendChart?.resize()
-  categoryChart?.resize()
-}
-
 onMounted(async () => {
   await loadOverviewData()
-  await loadTrendData()
-  await loadCategoryData()
-  window.addEventListener('resize', handleResize)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', handleResize)
-  trendChart?.dispose()
-  categoryChart?.dispose()
-})
-
-watch(trendPeriod, () => {
-  loadTrendData()
 })
 </script>
 
@@ -533,11 +410,6 @@ watch(trendPeriod, () => {
   color: #909399;
 }
 
-.chart-box {
-  width: 100%;
-  height: 320px;
-}
-
 .alert-list {
   display: flex;
   flex-direction: column;
@@ -580,9 +452,23 @@ watch(trendPeriod, () => {
   .welcome-illustration {
     align-items: flex-start;
   }
+}
 
-  .chart-box {
-    height: 260px;
-  }
+/* 给统计卡片图标补充颜色（原代码缺失） */
+.stat-icon.blue {
+  background: #ecf5ff;
+  color: #409eff;
+}
+.stat-icon.green {
+  background: #f0f9ff;
+  color: #67c23a;
+}
+.stat-icon.orange {
+  background: #fdf6ec;
+  color: #e6a23c;
+}
+.stat-icon.red {
+  background: #fef0f0;
+  color: #f56c6c;
 }
 </style>
