@@ -115,7 +115,7 @@ const sidebarMenus = [
     index: 'dashboard',
     title: '工作台',
     icon: Odometer,
-    path: '/home/dashboard',
+    path: '/statistics/dashboard',
   },
   {
     index: 'inventory',
@@ -125,12 +125,12 @@ const sidebarMenus = [
       {
         index: 'stock-list',
         title: '库存列表',
-        path: '/home/inventory/stock-list',
+        path: '/inventory/list',
       },
       {
         index: 'stock-check',
         title: '库存盘点',
-        path: '/home/inventory/stock-check',
+        path: '/inventory/stock-check',
       },
     ],
   },
@@ -138,19 +138,19 @@ const sidebarMenus = [
     index: 'inbound',
     title: '入库管理',
     icon: Download,
-    path: '/home/inbound',
+    path: '/inventory/inbound',
   },
   {
     index: 'outbound',
     title: '出库管理',
     icon: Upload,
-    path: '/home/outbound',
+    path: '/inventory/outbound',
   },
   {
     index: 'settings',
     title: '系统设置',
     icon: Setting,
-    path: '/home/settings',
+    path: '/settings',
   },
 ]
 

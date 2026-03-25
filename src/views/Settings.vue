@@ -1,3 +1,4 @@
+<!-- 系统设置 -->
 <template>
   <div class="flex flex-col items-center justify-center h-full text-gray-400">
     <el-icon class="text-6xl mb-4"><FolderOpened /></el-icon>

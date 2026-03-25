@@ -22,7 +22,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="出库数量" prop="quantity">
-          <el-input-number v-model="form.quantity" :min="1" :max="currentStock" style="width: 200px" />
+          <el-input-number v-model="form.quantity" :min="1" :max="currentStock || 9999" style="width: 200px" />
           <span v-if="currentStock !== null" class="ml-2 text-gray-400 text-sm">
             当前库存：{{ currentStock }}
           </span>
