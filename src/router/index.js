@@ -9,51 +9,114 @@ const routes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/statistics/dashboard',
+    redirect: '/statistics/dashboard', // 默认首页
     children: [
-      // 统计概览
+      // ==========================
+      // 1. 统计概览（一级目录）
+      // ==========================
       {
-        path: '/statistics/dashboard',
-        component: () => import('../views/statistics/Dashboard.vue'),
+        path: '/statistics',
         meta: { title: '统计概览' },
+        redirect: '/statistics/dashboard',
+        children: [
+          {
+            path: 'dashboard', // 简写，不用写全路径
+            component: () => import('../views/statistics/Dashboard.vue'),
+            meta: { title: '数据看板' },
+          },
+        ]
       },
-      // 物资管理
+
+      // ==========================
+      // 2. 物资管理（一级目录）
+      // ==========================
       {
-        path: '/goods/list',
-        component: () => import('../views/goods/List.vue'),
-        meta: { title: '物资列表' },
+        path: '/goods',
+        meta: { title: '物资管理' },
+        redirect: '/goods/list',
+        children: [
+          {
+            path: 'list',
+            component: () => import('../views/goods/List.vue'),
+            meta: { title: '物资列表' },
+          },
+        ]
       },
-      // 库存管理
+
+      // ==========================
+      // 3. 库存管理（一级目录）
+      // ==========================
       {
-        path: '/inventory/list',
-        component: () => import('../views/inventory/List.vue'),
-        meta: { title: '库存列表' },
+        path: '/inventory',
+        meta: { title: '库存管理' },
+        redirect: '/inventory/list',
+        children: [
+          {
+            path: 'list',
+            component: () => import('../views/inventory/List.vue'),
+            meta: { title: '库存列表' },
+          },
+          {
+            path: 'stock-check',
+            component: () => import('../views/inventory/StockCheck.vue'),
+            meta: { title: '库存盘点' },
+          },
+          {
+            path: 'inbound',
+            component: () => import('../views/inventory/Inbound.vue'),
+            meta: { title: '入库管理' },
+          },
+          {
+            path: 'outbound',
+            component: () => import('../views/inventory/Outbound.vue'),
+            meta: { title: '出库管理' },
+          },
+        ]
       },
+
+      // ==========================
+      // 4. 系统设置（一级目录）
+      // ==========================
       {
-        path: '/inventory/stock-check',
-        component: () => import('../views/inventory/StockCheck.vue'),
-        meta: { title: '库存盘点' },
+        path: '/setting',
+        meta: { title: '系统设置' },
+        redirect: '/setting/users',
+        children: [
+          {
+            path: 'users',
+            component: () => import('../views/setting/Users.vue'),
+            meta: { title: '用户管理' },
+          },
+          {
+            path: 'roles',
+            component: () => import('../views/setting/Roles.vue'),
+            meta: { title: '角色管理' },
+          },
+          {
+            path: 'warehouses',
+            component: () => import('../views/setting/Warehouses.vue'),
+            meta: { title: '仓库管理' },
+          },
+          {
+            path: 'config',
+            component: () => import('../views/setting/Config.vue'),
+            meta: { title: '系统参数' },
+          },
+          {
+            path: 'logs',
+            component: () => import('../views/setting/Logs.vue'),
+            meta: { title: '操作日志' },
+          },
+        ]
       },
-      {
-        path: '/inventory/inbound',
-        component: () => import('../views/inventory/Inbound.vue'),
-        meta: { title: '入库管理' },
-      },
-      {
-        path: '/inventory/outbound',
-        component: () => import('../views/inventory/Outbound.vue'),
-        meta: { title: '出库管理' },
-      },
+
+      // ==========================
+      // 5. 个人中心（单级）
+      // ==========================
       {
         path: '/personal-center',
         component: () => import('../views/PersonalCenter.vue'),
         meta: { title: '个人中心' },
-      },
-      // 系统页面
-      {
-        path: '/settings',
-        component: () => import('../views/Settings.vue'),
-        meta: { title: '系统设置' },
       },
     ]
   },
@@ -64,22 +127,12 @@ const router = createRouter({
   routes,
 })
 
-// 路由守卫（已修复）
+// 路由守卫
 router.beforeEach((to, from, next) => {
   const loggedIn = isLoggedIn()
-
-  // 未登录 → 只能访问 login
-  if (!loggedIn && to.path !== '/login') {
-    next('/login')
-  }
-  // 已登录 → 访问 login 自动跳首页
-  else if (loggedIn && to.path === '/login') {
-    next('/')
-  }
-  // 正常放行
-  else {
-    next()
-  }
+  if (!loggedIn && to.path !== '/login') next('/login')
+  else if (loggedIn && to.path === '/login') next('/')
+  else next()
 })
 
 export default router

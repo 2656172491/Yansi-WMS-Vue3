@@ -132,17 +132,3 @@ export const CATEGORIES = MOCK_CATEGORIES.map((c) => ({
   label: c.name,
   value: c.name,
 }))
-
-/** 面包屑导航映射 */
-export const MENU_BREADCRUMB_MAP = {
-  dashboard:      '统计概览',
-  goods:          '物资管理',
-  'goods-list':   '物资列表',
-  'goods-add':    '新增物资',
-  'inventory':    '库存管理',
-  'inv-list':     '库存列表',
-  'inv-inbound':  '入库管理',
-  'inv-outbound': '出库管理',
-  'stock-check':  '库存盘点',
-  settings:       '系统设置',
-}

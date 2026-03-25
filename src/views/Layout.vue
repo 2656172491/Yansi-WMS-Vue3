@@ -75,7 +75,7 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="router.push('/home/personal-center')">个人中心</el-dropdown-item>
+                <el-dropdown-item @click="router.push('/personal-center')">个人中心</el-dropdown-item>
                 <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -104,7 +104,7 @@ import {
   Goods,
   Download,
   Upload,
-  Setting, ArrowDown, Bell,
+  Setting, ArrowDown, Bell, MessageBox,
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -120,12 +120,24 @@ const sidebarMenus = [
   {
     index: 'inventory',
     title: '库存管理',
-    icon: Goods,
+    icon: MessageBox,
     children: [
       {
         index: 'stock-list',
         title: '库存列表',
         path: '/inventory/list',
+      },
+      {
+        index: 'inbound',
+        title: '入库管理',
+        icon: Download,
+        path: '/inventory/inbound',
+      },
+      {
+        index: 'outbound',
+        title: '出库管理',
+        icon: Upload,
+        path: '/inventory/outbound',
       },
       {
         index: 'stock-check',
@@ -135,22 +147,42 @@ const sidebarMenus = [
     ],
   },
   {
-    index: 'inbound',
-    title: '入库管理',
-    icon: Download,
-    path: '/inventory/inbound',
+    index: 'goods',
+    title: '物资管理',
+    icon: Goods,
+    path: '/goods/list',
   },
   {
-    index: 'outbound',
-    title: '出库管理',
-    icon: Upload,
-    path: '/inventory/outbound',
-  },
-  {
-    index: 'settings',
-    title: '系统设置',
+    index: 'setting',
+    title: '系统管理',
     icon: Setting,
-    path: '/settings',
+    children: [
+      {
+        index: 'user-management',
+        title: '用户管理',
+        path: '/setting/users',
+      },
+      {
+        index: 'role-management',
+        title: '角色管理',
+        path: '/setting/roles',
+      },
+      {
+        index: 'warehouse-management',
+        title: '仓库管理',
+        path: '/setting/warehouses',
+      },
+      {
+        index: 'setting-config',
+        title: '系统参数',
+        path: '/setting/config',
+      },
+      {
+        index: 'log',
+        title: '操作日志',
+        path: '/setting/logs',
+      },
+    ],
   },
 ]
 
