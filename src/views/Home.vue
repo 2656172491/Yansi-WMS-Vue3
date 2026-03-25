@@ -173,7 +173,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import * as echarts from 'echarts'
-import { Box, Goods, Download, Upload, List, Bell, User } from '@element-plus/icons-vue'
+import { Box, Goods, Download, Upload, List, Bell, } from '@element-plus/icons-vue'
 import { getOverview, getTrend, getCategoryStats } from '@/api/statistics.js'
 import { useAuthStore } from '@/store/index.js'
 
@@ -474,11 +474,6 @@ watch(trendPeriod, () => {
   justify-content: center;
   font-size: 24px;
 }
-
-.stat-icon.blue { background: #e8f3ff; color: #409eff; }
-.stat-icon.green { background: #ecf9f0; color: #67c23a; }
-.stat-icon.orange { background: #fff6e8; color: #e6a23c; }
-.stat-icon.red { background: #fdecec; color: #f56c6c; }
 
 .stat-title {
   font-size: 14px;
