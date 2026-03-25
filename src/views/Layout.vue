@@ -1,87 +1,9 @@
 <template>
   <el-container style="height: 100vh; margin: 0; padding: 0">
-    <!-- 侧边栏 -->
-    <el-aside width="auto" style="background-color: #304156; height: 100vh">
-      <div class="logo-container" v-if="!isCollapse">
-        <el-icon class="logo-icon"><Box /></el-icon>
-        <span>言寺 WMS</span>
-      </div>
-      <div class="logo-container" v-else>
-        <el-icon class="logo-icon"><Box /></el-icon>
-      </div>
-
-      <el-menu
-          :default-active="activeMenu"
-          class="aside-menu"
-          background-color="#304156"
-          text-color="#bfcbd9"
-          active-text-color="#409EFF"
-          :collapse="isCollapse"
-          @select="handleMenuSelect"
-      >
-        <template v-for="item in sidebarMenus" :key="item.index">
-          <el-sub-menu v-if="item.children" :index="item.index">
-            <template #title>
-              <el-icon><component :is="item.icon" /></el-icon>
-              <span>{{ item.title }}</span>
-            </template>
-
-            <el-menu-item
-                v-for="child in item.children"
-                :key="child.index"
-                :index="child.index"
-            >
-              {{ child.title }}
-            </el-menu-item>
-          </el-sub-menu>
-
-          <el-menu-item v-else :index="item.index">
-            <el-icon><component :is="item.icon" /></el-icon>
-            <template #title>{{ item.title }}</template>
-          </el-menu-item>
-        </template>
-      </el-menu>
-    </el-aside>
+    <Sidebar :is-collapse="isCollapse" />
 
     <el-container style="height: 100vh">
-      <!-- 顶部 Header -->
-      <el-header class="header-container">
-        <div class="flex items-center">
-          <el-icon
-              class="cursor-pointer text-xl text-gray-600 hover:text-blue-500 mr-4"
-              @click="isCollapse = !isCollapse"
-          >
-            <component :is="isCollapse ? 'Expand' : 'Fold'" />
-          </el-icon>
-          <el-breadcrumb separator="/">
-            <el-breadcrumb-item>首页</el-breadcrumb-item>
-            <el-breadcrumb-item>{{ currentBreadcrumb }}</el-breadcrumb-item>
-          </el-breadcrumb>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <el-badge :value="3" class="item cursor-pointer">
-            <el-icon class="text-xl text-gray-600"><Bell /></el-icon>
-          </el-badge>
-          <el-dropdown trigger="click">
-            <span class="el-dropdown-link flex items-center cursor-pointer text-gray-700">
-              <el-avatar
-                  :size="32"
-                  src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-                  class="mr-2"
-              />
-              管理员
-              <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-            </span>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item @click="handlePersonalCenter">个人中心</el-dropdown-item>
-                <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </div>
-      </el-header>
+      <Header :is-collapse="isCollapse" @toggle-collapse="isCollapse = !isCollapse" />
 
       <!-- 主内容区域 -->
       <el-main class="main-container">
@@ -92,103 +14,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Box, Odometer, Goods, Download, Upload, Setting, ArrowDown, Bell, PieChart } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import Sidebar from '@/components/Sidebar.vue'
+import Header from '@/components/Header.vue'
 
-const router = useRouter()
-const route = useRoute()
-
-const sidebarMenus = [
-  {
-    index: 'workbench',
-    title: '工作台',
-    icon: Odometer,
-    path: '/home/workbench',
-  },
-  {
-    index: 'inventory',
-    title: '库存管理',
-    icon: Goods,
-    children: [
-      { index: 'stock-list', title: '库存列表', path: '/home/inventory/stock-list' },
-      { index: 'stock-check', title: '库存盘点', path: '/home/inventory/stock-check' },
-    ],
-  },
-  { index: 'inbound', title: '入库管理', icon: Download, path: '/home/inbound' },
-  { index: 'outbound', title: '出库管理', icon: Upload, path: '/home/outbound' },
-  { index: 'statistics', title: '统计分析', icon: PieChart, path: '/home/statistics' },
-  { index: 'settings', title: '系统设置', icon: Setting, path: '/home/settings' },
-]
-
-const menuRouteMap = {}
-const buildMenuRouteMap = (menus) => {
-  menus.forEach((item) => {
-    if (item.path) menuRouteMap[item.index] = item.path
-    if (item.children) buildMenuRouteMap(item.children)
-  })
-}
-buildMenuRouteMap(sidebarMenus)
-
-const activeMenu = computed(() => {
-  const path = route.path
-  for (const [key, routePath] of Object.entries(menuRouteMap)) {
-    if (path.startsWith(routePath)) return key
-  }
-  return 'workbench'
-})
-
-const currentBreadcrumb = computed(() => route.meta?.title || '工作台')
 const isCollapse = ref(false)
-
-const handleMenuSelect = (key) => {
-  const target = menuRouteMap[key]
-  if (target) router.push(target)
-}
-
-const handlePersonalCenter = () => {
-  router.push('/home/personal-center')
-}
-
-const handleLogout = () => {
-  ElMessageBox.confirm('确定退出登录？', '提示', { type: 'warning' })
-      .then(() => {
-        localStorage.clear()
-        router.push('/login')
-        ElMessage.success('退出成功')
-      })
-      .catch(() => {})
-}
 </script>
 
 <style scoped>
-.logo-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 0;
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  border-bottom: 1px solid #485668;
-}
-.logo-icon {
-  font-size: 24px;
-  margin-right: 8px;
-}
-.aside-menu {
-  border-right: none;
-}
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
-  border-bottom: 1px solid #f0f0f0;
-  padding: 0 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-}
 .main-container {
   padding: 20px;
   background-color: #f5f7fa;
