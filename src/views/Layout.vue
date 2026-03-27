@@ -172,14 +172,14 @@ const sidebarMenus = [
         path: '/setting/warehouses',
       },
       {
-        index: 'setting-config',
-        title: '系统参数',
-        path: '/setting/config',
-      },
-      {
         index: 'log',
         title: '操作日志',
         path: '/setting/logs',
+      },
+      {
+        index: 'setting-config',
+        title: '系统参数',
+        path: '/setting/config',
       },
     ],
   },
