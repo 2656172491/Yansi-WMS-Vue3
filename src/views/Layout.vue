@@ -84,6 +84,12 @@
       <el-main class="main-container">
         <router-view />
       </el-main>
+
+      <!-- 底部备案信息 -->
+      <el-footer class="footer-container">
+        <span>© 2026 Yansi WMS · 仓库管理系统</span>
+        <span>备案号：粤ICP备XXXXXXXX号 &nbsp;·&nbsp; v1.0.0</span>
+      </el-footer>
     </el-container>
   </el-container>
 </template>
@@ -254,5 +260,17 @@ const handleLogout = () => {
 .main-container {
   padding: 20px;
   background-color: #f5f7fa;
+}
+.footer-container {
+  height: auto !important;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background-color: #fff;
+  border-top: 1px solid #ebeef5;
+  color: #909399;
+  font-size: 12px;
 }
 </style>

@@ -1,5 +1,7 @@
 // src/api/log.js — 操作日志 API（当前使用 Mock 数据）
-// 后端集成时：将函数体替换为 request.get/post/delete 调用，删除 mock 逻辑即可。
+// 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
+
+import request from '@/utils/request.js'
 
 /** Mock 日志列表（运行时可写副本） */
 let logs = [
@@ -76,12 +78,15 @@ let nextLogId = Math.max(...logs.map((l) => l.id)) + 1
 
 /**
  * 分页查询操作日志列表
+ * 接口：GET /api/log/list
  * @param {{ page?: number, pageSize?: number, operator?: string, type?: string, startDate?: string, endDate?: string }} params
  *   - type: 'login' | 'create' | 'update' | 'delete' | 'check' | 'inventory'
  *   - startDate / endDate: 'YYYY-MM-DD' 格式的日期字符串
  * @returns {Promise<{ records: object[], total: number, page: number, pageSize: number }>}
+ *   - records[]: { id, time, operator, type, typeLabel, module, content, ip, success }
  */
 export function getLogList(params = {}) {
+  // 后端就绪后替换为：return request.get('/log/list', { params })
   return new Promise((resolve) => {
     setTimeout(() => {
       let list = [...logs]
@@ -100,10 +105,12 @@ export function getLogList(params = {}) {
 
 /**
  * 根据 ID 获取日志详情
+ * 接口：GET /api/log/:id
  * @param {number} id
- * @returns {Promise<object>} 日志详情，包含 time、operator、type、module、content、ip、success 等字段
+ * @returns {Promise<object>} 日志详情，包含 time、operator、type、typeLabel、module、content、ip、success 等字段
  */
 export function getLogById(id) {
+  // 后端就绪后替换为：return request.get(`/log/${id}`)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const item = logs.find((l) => l.id === id)
@@ -120,14 +127,16 @@ export function getLogById(id) {
 
 /**
  * 导出操作日志（触发文件下载）
+ * 接口：GET /api/log/export
  * @param {{ operator?: string, type?: string, startDate?: string, endDate?: string }} params — 与 getLogList 相同的筛选条件
  * @returns {Promise<null>}
- * TODO: 后端集成时返回文件 Blob 或下载链接，前端调用 URL.createObjectURL 触发下载
+ * 后端集成时：使用 request.get('/log/export', { params, responseType: 'blob' }) 接收文件流，
+ *   再通过 URL.createObjectURL 触发浏览器下载。
  */
 export function exportLogs(params = {}) {
+  // 后端就绪后替换为：return request.get('/log/export', { params, responseType: 'blob' })
   return new Promise((resolve) => {
     setTimeout(() => {
-      // TODO: 后端集成时发送 GET /api/log/export?... 并接收文件流
       resolve({ code: 200, msg: '导出成功' })
     }, 600)
   })
@@ -135,10 +144,12 @@ export function exportLogs(params = {}) {
 
 /**
  * 按时间范围批量删除日志
+ * 接口：DELETE /api/log
  * @param {{ startDate: string, endDate: string }} params — 'YYYY-MM-DD' 格式的起止日期（含边界）
  * @returns {Promise<{ deletedCount: number }>} 返回实际删除的条数
  */
 export function deleteLogsByRange(params) {
+  // 后端就绪后替换为：return request.delete('/log', { data: params })
   return new Promise((resolve) => {
     setTimeout(() => {
       const before = logs.length
@@ -147,7 +158,6 @@ export function deleteLogsByRange(params) {
         return date < params.startDate || date > params.endDate
       })
       const deletedCount = before - logs.length
-      // TODO: 后端集成时发送 DELETE /api/log 并传入时间范围参数
       resolve({ code: 200, msg: `已删除 ${deletedCount} 条日志`, data: { deletedCount } })
     }, 400)
   })

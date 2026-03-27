@@ -1,5 +1,7 @@
 // src/api/user.js — 用户管理 API（当前使用 Mock 数据）
-// 后端集成时：将函数体替换为 request.get/post/put/delete 调用，删除 mock 逻辑即可。
+// 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
+
+import request from '@/utils/request.js'
 
 /** Mock 用户列表（运行时可写副本） */
 let users = [
@@ -50,10 +52,13 @@ let nextUserId = Math.max(...users.map((u) => u.id)) + 1
 
 /**
  * 分页查询用户列表
+ * 接口：GET /api/user/list
  * @param {{ page?: number, pageSize?: number, username?: string, role?: string, status?: string }} params
  * @returns {Promise<{ records: object[], total: number, page: number, pageSize: number }>}
+ *   - records[]: { id, username, realName, role, phone, email, status, lastLogin }
  */
 export function getUserList(params = {}) {
+  // 后端就绪后替换为：return request.get('/user/list', { params })
   return new Promise((resolve) => {
     setTimeout(() => {
       let list = [...users]
@@ -71,10 +76,12 @@ export function getUserList(params = {}) {
 
 /**
  * 根据 ID 获取用户详情
+ * 接口：GET /api/user/:id
  * @param {number} id
- * @returns {Promise<object>} 用户信息对象
+ * @returns {Promise<object>} 用户信息对象（字段同列表中的 records 项）
  */
 export function getUserById(id) {
+  // 后端就绪后替换为：return request.get(`/user/${id}`)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const item = users.find((u) => u.id === id)
@@ -91,10 +98,12 @@ export function getUserById(id) {
 
 /**
  * 新增用户
+ * 接口：POST /api/user
  * @param {{ username: string, realName: string, role: string, phone: string, email: string, status: string }} data
- * @returns {Promise<object>} 新创建的用户对象
+ * @returns {Promise<object>} 新创建的用户对象（含服务端生成的 id）
  */
 export function addUser(data) {
+  // 后端就绪后替换为：return request.post('/user', data)
   return new Promise((resolve) => {
     setTimeout(() => {
       const item = {
@@ -110,10 +119,12 @@ export function addUser(data) {
 
 /**
  * 修改用户信息
- * @param {object} data — 必须含 id
+ * 接口：PUT /api/user/:id
+ * @param {object} data — 必须含 id，其余字段同新增
  * @returns {Promise<object>} 更新后的用户对象
  */
 export function updateUser(data) {
+  // 后端就绪后替换为：return request.put(`/user/${data.id}`, data)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const index = users.findIndex((u) => u.id === data.id)
@@ -129,10 +140,12 @@ export function updateUser(data) {
 
 /**
  * 删除用户
+ * 接口：DELETE /api/user/:id
  * @param {number} id
  * @returns {Promise<null>}
  */
 export function deleteUser(id) {
+  // 后端就绪后替换为：return request.delete(`/user/${id}`)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const index = users.findIndex((u) => u.id === id)
@@ -150,11 +163,13 @@ export function deleteUser(id) {
 
 /**
  * 启用或禁用用户
+ * 接口：PUT /api/user/:id/status
  * @param {number} id
  * @param {'启用' | '禁用'} status
  * @returns {Promise<null>}
  */
 export function updateUserStatus(id, status) {
+  // 后端就绪后替换为：return request.put(`/user/${id}/status`, { status })
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const item = users.find((u) => u.id === id)
@@ -170,11 +185,13 @@ export function updateUserStatus(id, status) {
 
 /**
  * 重置用户密码
+ * 接口：PUT /api/user/:id/password
  * @param {number} id — 用户 ID
  * @param {string} newPassword — 新密码（明文，后端应加密存储）
  * @returns {Promise<null>}
  */
 export function resetUserPassword(id, newPassword) {
+  // 后端就绪后替换为：return request.put(`/user/${id}/password`, { newPassword })
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const item = users.find((u) => u.id === id)
@@ -182,7 +199,6 @@ export function resetUserPassword(id, newPassword) {
         reject(new Error('用户不存在'))
         return
       }
-      // TODO: 后端集成时发送加密密码到 /api/user/{id}/password
       resolve({ code: 200, msg: '密码重置成功' })
     }, 400)
   })

@@ -10,7 +10,7 @@
           <h2>系统参数</h2>
           <p>
             用于配置仓库管理系统的基础信息、业务规则、安全策略和通知设置。
-            当前页面为前端静态配置示例，后续可接入后端接口保存。
+            配置项通过 API 加载并保存，后端就绪后自动生效。
           </p>
         </div>
       </div>
@@ -251,9 +251,10 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
 import { Setting } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getSystemConfig, saveSystemConfig, resetSystemConfig } from '@/api/config.js'
 
 const defaultForm = {
   systemName: 'Yansi WMS',
@@ -283,8 +284,20 @@ const defaultForm = {
 
 const formData = reactive({ ...defaultForm })
 
+onMounted(() => {
+  getSystemConfig().then((res) => {
+    Object.assign(formData, res.data)
+  }).catch(() => {
+    ElMessage.error('加载系统配置失败')
+  })
+})
+
 const handleSave = () => {
-  ElMessage.success('系统参数保存成功')
+  saveSystemConfig({ ...formData }).then(() => {
+    ElMessage.success('系统参数保存成功')
+  }).catch(() => {
+    ElMessage.error('保存失败，请重试')
+  })
 }
 
 const handleReset = () => {
@@ -292,8 +305,10 @@ const handleReset = () => {
     type: 'warning',
   })
       .then(() => {
-        Object.assign(formData, defaultForm)
-        ElMessage.success('已恢复默认配置')
+        resetSystemConfig().then((res) => {
+          Object.assign(formData, res.data)
+          ElMessage.success('已恢复默认配置')
+        })
       })
       .catch(() => {})
 }

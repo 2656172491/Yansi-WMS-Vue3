@@ -1,5 +1,7 @@
 // src/api/warehouse.js — 仓库管理 API（当前使用 Mock 数据）
-// 后端集成时：将函数体替换为 request.get/post/put/delete 调用，删除 mock 逻辑即可。
+// 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
+
+import request from '@/utils/request.js'
 
 /** Mock 仓库列表（运行时可写副本） */
 let warehouses = [
@@ -58,10 +60,13 @@ let nextWarehouseId = Math.max(...warehouses.map((w) => w.id)) + 1
 
 /**
  * 分页查询仓库列表
+ * 接口：GET /api/warehouse/list
  * @param {{ page?: number, pageSize?: number, name?: string, status?: string }} params
  * @returns {Promise<{ records: object[], total: number, page: number, pageSize: number }>}
+ *   - records[]: { id, name, code, address, manager, phone, capacity, used, status, createTime }
  */
 export function getWarehouseList(params = {}) {
+  // 后端就绪后替换为：return request.get('/warehouse/list', { params })
   return new Promise((resolve) => {
     setTimeout(() => {
       let list = [...warehouses]
@@ -78,10 +83,12 @@ export function getWarehouseList(params = {}) {
 
 /**
  * 根据 ID 获取仓库详情
+ * 接口：GET /api/warehouse/:id
  * @param {number} id
  * @returns {Promise<object>} 仓库信息对象（含 capacity、used、manager 等字段）
  */
 export function getWarehouseById(id) {
+  // 后端就绪后替换为：return request.get(`/warehouse/${id}`)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const item = warehouses.find((w) => w.id === id)
@@ -96,9 +103,11 @@ export function getWarehouseById(id) {
 
 /**
  * 获取所有仓库（供下拉选择用）
+ * 接口：GET /api/warehouse/all
  * @returns {Promise<object[]>} 仓库简要信息列表（id、name、code）
  */
 export function getWarehouseAll() {
+  // 后端就绪后替换为：return request.get('/warehouse/all')
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
@@ -114,10 +123,12 @@ export function getWarehouseAll() {
 
 /**
  * 新增仓库
+ * 接口：POST /api/warehouse
  * @param {{ name: string, code: string, address: string, manager: string, phone: string, capacity: number, used?: number, status: string }} data
- * @returns {Promise<object>} 新创建的仓库对象
+ * @returns {Promise<object>} 新创建的仓库对象（含服务端生成的 id、createTime）
  */
 export function addWarehouse(data) {
+  // 后端就绪后替换为：return request.post('/warehouse', data)
   return new Promise((resolve) => {
     setTimeout(() => {
       const item = {
@@ -134,10 +145,12 @@ export function addWarehouse(data) {
 
 /**
  * 修改仓库信息
- * @param {object} data — 必须含 id
+ * 接口：PUT /api/warehouse/:id
+ * @param {object} data — 必须含 id，其余字段同新增
  * @returns {Promise<object>} 更新后的仓库对象
  */
 export function updateWarehouse(data) {
+  // 后端就绪后替换为：return request.put(`/warehouse/${data.id}`, data)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const index = warehouses.findIndex((w) => w.id === data.id)
@@ -153,10 +166,12 @@ export function updateWarehouse(data) {
 
 /**
  * 删除仓库
+ * 接口：DELETE /api/warehouse/:id
  * @param {number} id
  * @returns {Promise<null>}
  */
 export function deleteWarehouse(id) {
+  // 后端就绪后替换为：return request.delete(`/warehouse/${id}`)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const index = warehouses.findIndex((w) => w.id === id)
@@ -174,11 +189,13 @@ export function deleteWarehouse(id) {
 
 /**
  * 更新仓库状态
+ * 接口：PUT /api/warehouse/:id/status
  * @param {number} id
  * @param {'启用' | '停用' | '维护中'} status
  * @returns {Promise<null>}
  */
 export function updateWarehouseStatus(id, status) {
+  // 后端就绪后替换为：return request.put(`/warehouse/${id}/status`, { status })
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const item = warehouses.find((w) => w.id === id)
