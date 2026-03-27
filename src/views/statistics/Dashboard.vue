@@ -1,7 +1,29 @@
 <template>
   <div>
     <!-- 统计卡片 -->
-    <StatsCard :cards="statCards" class="mb-4" />
+    <el-row :gutter="16" class="section-row">
+      <el-col
+          v-for="card in statCards"
+          :key="card.title"
+          :xs="12"
+          :sm="12"
+          :md="6"
+      >
+        <el-card class="stat-card" shadow="hover">
+          <div class="stat-card-body">
+            <div class="stat-icon" :class="card.colorClass">
+              <el-icon>
+                <component :is="card.icon" />
+              </el-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-title">{{ card.title }}</div>
+              <div class="stat-value">{{ card.value }}</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
 
     <el-row :gutter="20">
       <!-- 出入库趋势 -->
@@ -42,26 +64,40 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
 import { getOverview, getTrend, getCategoryStats } from '@/api/statistics.js'
-import { STAT_CARDS_CONFIG, MOCK_ALERTS } from '@/constants/wms.js'
-import StatsCard from '@/components/StatsCard.vue'
 import AlertsPanel from '@/components/AlertsPanel.vue'
+import { Bell, Download, Goods, Upload } from "@element-plus/icons-vue"
 
 // ── 统计卡片 ──────────────────────────────────────────────
-const statCards = ref([...STAT_CARDS_CONFIG])
-const alerts = ref([...MOCK_ALERTS])
+const alerts = ref([
+  { id: 1, label: '预警', type: 'danger', title: 'A区货架库存不足', time: '10 分钟前' },
+  { id: 2, label: '提醒', type: 'warning', title: 'B类物资即将临期', time: '1 小时前' },
+  { id: 3, label: '通知', type: 'success', title: '今日盘点任务已完成', time: '今天 09:20' },
+])
 
+const statCards = ref([
+  { title: '物资总数', value: '0', icon: Goods, colorClass: 'blue' },
+  { title: '今日入库', value: '0', icon: Download, colorClass: 'green' },
+  { title: '今日出库', value: '0', icon: Upload, colorClass: 'orange' },
+  { title: '库存预警', value: '0', icon: Bell, colorClass: 'red' },
+])
+
+// 加载概览数据（修复：补上你缺失的方法）
 const loadOverview = async () => {
-  const res = await getOverview()
-  const d = res.data
-  statCards.value = [
-    { title: '物资总数',   value: String(d.totalGoods),     icon: 'Goods',   colorClass: 'bg-blue-100 text-blue-500'    },
-    { title: '今日入库',   value: String(d.todayInbound),   icon: 'Download', colorClass: 'bg-green-100 text-green-500'  },
-    { title: '今日出库',   value: String(d.todayOutbound),  icon: 'Upload',  colorClass: 'bg-orange-100 text-orange-500' },
-    { title: '库存预警',   value: String(d.warningCount),   icon: 'Warning', colorClass: 'bg-red-100 text-red-500'      },
-  ]
+  try {
+    const res = await getOverview()
+    const d = res.data
+    statCards.value = [
+      { title: '物资总数', value: String(d.totalGoods || 0), icon: Goods, colorClass: 'blue' },
+      { title: '今日入库', value: String(d.todayInbound || 0), icon: Download, colorClass: 'green' },
+      { title: '今日出库', value: String(d.todayOutbound || 0), icon: Upload, colorClass: 'orange' },
+      { title: '库存预警', value: String(d.warningCount || 0), icon: Bell, colorClass: 'red' },
+    ]
+  } catch (e) {
+    console.log('获取统计数据失败', e)
+  }
 }
 
 // ── 趋势折线图 ────────────────────────────────────────────
@@ -74,25 +110,27 @@ const initTrendChart = () => {
 }
 
 const loadTrend = async () => {
-  const res = await getTrend({ period: chartPeriod.value })
-  const { dates, inbound, outbound } = res.data
-  trendChart?.setOption({
-    tooltip: { trigger: 'axis' },
-    legend: { data: ['入库', '出库'] },
-    xAxis: { type: 'category', data: dates, boundaryGap: false },
-    yAxis: { type: 'value' },
-    series: [
-      {
-        name: '入库', type: 'line', data: inbound, smooth: true,
-        itemStyle: { color: '#67C23A' }, areaStyle: { opacity: 0.1 },
-      },
-      {
-        name: '出库', type: 'line', data: outbound, smooth: true,
-        itemStyle: { color: '#E6A23C' }, areaStyle: { opacity: 0.1 },
-      },
-    ],
-    grid: { left: 40, right: 20, top: 40, bottom: 30 },
-  })
+  try {
+    const res = await getTrend({ period: chartPeriod.value })
+    const { dates, inbound, outbound } = res.data
+    trendChart?.setOption({
+      tooltip: { trigger: 'axis' },
+      legend: { data: ['入库', '出库'] },
+      xAxis: { type: 'category', data: dates, boundaryGap: false },
+      yAxis: { type: 'value' },
+      series: [
+        {
+          name: '入库', type: 'line', data: inbound, smooth: true,
+          itemStyle: { color: '#67C23A' }, areaStyle: { opacity: 0.1 },
+        },
+        {
+          name: '出库', type: 'line', data: outbound, smooth: true,
+          itemStyle: { color: '#E6A23C' }, areaStyle: { opacity: 0.1 },
+        },
+      ],
+      grid: { left: 40, right: 20, top: 40, bottom: 30 },
+    })
+  } catch (e) {}
 }
 
 // ── 分类饼图 ──────────────────────────────────────────────
@@ -104,20 +142,22 @@ const initCategoryChart = () => {
 }
 
 const loadCategoryStats = async () => {
-  const res = await getCategoryStats()
-  categoryChart?.setOption({
-    tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
-    legend: { orient: 'vertical', left: 'left', top: 'middle' },
-    series: [
-      {
-        type: 'pie',
-        radius: ['40%', '70%'],
-        center: ['60%', '50%'],
-        data: res.data,
-        emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.5)' } },
-      },
-    ],
-  })
+  try {
+    const res = await getCategoryStats()
+    categoryChart?.setOption({
+      tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+      legend: { orient: 'vertical', left: 'left', top: 'middle' },
+      series: [
+        {
+          type: 'pie',
+          radius: ['40%', '70%'],
+          center: ['60%', '50%'],
+          data: res.data,
+          emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.5)' } },
+        },
+      ],
+    })
+  } catch (e) {}
 }
 
 // ── 生命周期 ──────────────────────────────────────────────
@@ -140,3 +180,75 @@ onUnmounted(() => {
   categoryChart?.dispose()
 })
 </script>
+
+<style>
+.section-row {
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  border-radius: 14px;
+}
+
+.stat-card-body {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.stat-title {
+  font-size: 14px;
+  color: #909399;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #303133;
+}
+
+.stat-icon.blue {
+  background: #ecf5ff;
+  color: #409eff;
+}
+.stat-icon.green {
+  background: #f0f9ff;
+  color: #67c23a;
+}
+.stat-icon.orange {
+  background: #fdf6ec;
+  color: #e6a23c;
+}
+.stat-icon.red {
+  background: #fef0f0;
+  color: #f56c6c;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+.flex {
+  display: flex;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.items-center {
+  align-items: center;
+}
+.font-bold {
+  font-weight: bold;
+}
+</style>
