@@ -1,4 +1,3 @@
-<!-- 库存盘点 -->
 <template>
   <div class="stock-check-page">
     <!-- 顶部操作栏 -->
@@ -35,11 +34,12 @@
       <el-empty v-if="!currentCheck.id" description="点击【新建盘点单】开始盘点" />
 
       <el-table v-else :data="checkItems" border stripe style="width: 100%">
-        <el-table-column label="物资编号" prop="goodsCode" />
-        <el-table-column label="物资名称" prop="goodsName" />
-        <el-table-column label="规格" prop="specs" />
-        <el-table-column label="账面数量" prop="bookQuantity" />
-        <el-table-column label="实盘数量">
+        <el-table-column label="物资编号" prop="goodsCode" width="140" />
+        <el-table-column label="物资名称" prop="goodsName" min-width="160" />
+        <el-table-column label="分类" prop="category" width="120" />
+        <el-table-column label="规格" prop="specs" min-width="140" />
+        <el-table-column label="账面数量" prop="bookQuantity" width="100" />
+        <el-table-column label="实盘数量" width="140">
           <template #default="scope">
             <el-input-number
                 v-model="scope.row.actualQuantity"
@@ -49,14 +49,14 @@
             />
           </template>
         </el-table-column>
-        <el-table-column label="差异数量">
+        <el-table-column label="差异数量" width="100">
           <template #default="scope">
             <span :class="scope.row.diffQuantity > 0 ? 'diff-plus' : scope.row.diffQuantity < 0 ? 'diff-minus' : ''">
               {{ scope.row.diffQuantity }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="差异原因">
+        <el-table-column label="差异原因" min-width="180">
           <template #default="scope">
             <el-input v-model="scope.row.diffReason" placeholder="选填" clearable />
           </template>
@@ -93,9 +93,9 @@
         <el-table-column label="盘点时间" prop="createTime" />
         <el-table-column label="盘点人" prop="checker" />
         <el-table-column label="状态" prop="statusText" />
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="120">
           <template #default="scope">
-            <el-button type="text" @click="handleViewDetail(scope.row)">查看明细</el-button>
+            <el-button type="primary" link @click="handleViewDetail(scope.row)">查看明细</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -105,12 +105,11 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { Plus, Check, Download } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/store/index.js'
+import { MOCK_INVENTORY, MOCK_GOODS, CATEGORY_MAP } from '@/constants/wms.js'
 
-const router = useRouter()
 const authStore = useAuthStore()
 
 // 当前盘点单
@@ -121,7 +120,7 @@ const currentCheck = reactive({
   statusText: '未开始盘点',
 })
 
-// 盘点明细
+// 从项目静态数据生成盘点明细
 const checkItems = ref([])
 
 // 历史记录
@@ -130,6 +129,13 @@ const historyList = ref([
     id: 1,
     checkNo: 'CK20260327001',
     createTime: '2026-03-27 10:20',
+    checker: '管理员',
+    statusText: '已完成',
+  },
+  {
+    id: 2,
+    checkNo: 'CK20260326001',
+    createTime: '2026-03-26 15:40',
     checker: '管理员',
     statusText: '已完成',
   },
@@ -145,9 +151,9 @@ const checkStatusTag = computed(() => {
 
 // 统计
 const totalCount = computed(() => checkItems.value.length)
-const checkedCount = computed(() => checkItems.value.filter(i => i.actualQuantity > 0).length)
-const plusCount = computed(() => checkItems.value.filter(i => i.diffQuantity > 0).length)
-const minusCount = computed(() => checkItems.value.filter(i => i.diffQuantity < 0).length)
+const checkedCount = computed(() => checkItems.value.filter((i) => i.actualQuantity > 0).length)
+const plusCount = computed(() => checkItems.value.filter((i) => i.diffQuantity > 0).length)
+const minusCount = computed(() => checkItems.value.filter((i) => i.diffQuantity < 0).length)
 
 // 新建盘点
 const handleCreateCheck = () => {
@@ -156,12 +162,22 @@ const handleCreateCheck = () => {
   currentCheck.status = 1
   currentCheck.statusText = '盘点中'
 
-  // 模拟库存数据
-  checkItems.value = [
-    { id: 1, goodsCode: 'SP001', goodsName: '笔记本电脑', specs: '16G+512G', bookQuantity: 10, actualQuantity: 0, diffQuantity: 0, diffReason: '' },
-    { id: 2, goodsCode: 'SP002', goodsName: '办公打印纸', specs: 'A4 70g', bookQuantity: 52, actualQuantity: 0, diffQuantity: 0, diffReason: '' },
-    { id: 3, goodsCode: 'SP003', goodsName: '中性笔', specs: '黑色0.5', bookQuantity: 126, actualQuantity: 0, diffQuantity: 0, diffReason: '' },
-  ]
+  // 使用项目中的静态数据生成盘点项
+  checkItems.value = MOCK_INVENTORY.map((inv) => {
+    const goods = MOCK_GOODS.find((g) => g.id === inv.goods_id)
+    return {
+      id: inv.id,
+      goodsCode: inv.goods_code,
+      goodsName: inv.goods_name,
+      category: CATEGORY_MAP[inv.category_id] || '-',
+      specs: goods?.specification || '-',
+      bookQuantity: inv.quantity,
+      actualQuantity: 0,
+      diffQuantity: 0,
+      diffReason: '',
+    }
+  })
+
   ElMessage.success('已创建盘点单：' + currentCheck.checkNo)
 }
 
@@ -178,6 +194,14 @@ const handleConfirmCheck = () => {
   currentCheck.status = 2
   currentCheck.statusText = '已完成'
   ElMessage.success('盘点确认成功，库存已自动更新！')
+
+  historyList.value.unshift({
+    id: Date.now(),
+    checkNo: currentCheck.checkNo,
+    createTime: new Date().toLocaleString('zh-CN', { hour12: false }),
+    checker: authStore.realName || '管理员',
+    statusText: '已完成',
+  })
 }
 
 // 导出
@@ -209,7 +233,8 @@ const handleViewDetail = (row) => {
   align-items: center;
 }
 
-.left, .right {
+.left,
+.right {
   display: flex;
   align-items: center;
   gap: 12px;
