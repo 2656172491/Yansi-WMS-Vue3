@@ -1,6 +1,7 @@
 // src/api/inventory.js — 库存管理 API（当前使用 Mock 数据）
-// 后端集成时：将函数体替换为 request.get/post 调用。
+// 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
 
+import request from '@/utils/request.js'
 import { MOCK_INVENTORY, MOCK_RECORDS } from '@/constants/wms.js'
 
 // 运行时可写副本
@@ -12,9 +13,13 @@ let nextRecordId = Math.max(...records.map((r) => r.id)) + 1
 
 /**
  * 分页查询库存列表
+ * 接口：GET /api/inventory/list
  * @param {{ page?: number, pageSize?: number, goods_name?: string, goods_code?: string }} params
+ * @returns {Promise<{ records: object[], total: number, page: number, pageSize: number }>}
+ *   - records[]: { id, goods_id, goods_name, goods_code, category_id, unit, warehouse_id, quantity }
  */
 export function getInventoryList(params = {}) {
+  // 后端就绪后替换为：return request.get('/inventory/list', { params })
   return new Promise((resolve) => {
     setTimeout(() => {
       let list = [...inventory]
@@ -33,9 +38,12 @@ export function getInventoryList(params = {}) {
 
 /**
  * 物资入库
+ * 接口：POST /api/inventory/inbound
  * @param {{ goods_id: number, quantity: number, remark?: string }} data
+ * @returns {Promise<object>} 新生成的出入库记录，含 id、before_quantity、after_quantity、create_time
  */
 export function inbound(data) {
+  // 后端就绪后替换为：return request.post('/inventory/inbound', data)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const inv = inventory.find((i) => i.goods_id === data.goods_id)
@@ -67,9 +75,12 @@ export function inbound(data) {
 
 /**
  * 物资出库
+ * 接口：POST /api/inventory/outbound
  * @param {{ goods_id: number, quantity: number, remark?: string }} data
+ * @returns {Promise<object>} 新生成的出入库记录，含 id、before_quantity、after_quantity、create_time
  */
 export function outbound(data) {
+  // 后端就绪后替换为：return request.post('/inventory/outbound', data)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const inv = inventory.find((i) => i.goods_id === data.goods_id)
@@ -105,9 +116,14 @@ export function outbound(data) {
 
 /**
  * 分页查询出入库记录
+ * 接口：GET /api/inventory/records
  * @param {{ page?: number, pageSize?: number, type?: number, goods_name?: string }} params
+ *   - type: 1 入库 | 2 出库
+ * @returns {Promise<{ records: object[], total: number, page: number, pageSize: number }>}
+ *   - records[]: { id, goods_id, goods_name, type, quantity, before_quantity, after_quantity, operator, remark, create_time }
  */
 export function getRecordList(params = {}) {
+  // 后端就绪后替换为：return request.get('/inventory/records', { params })
   return new Promise((resolve) => {
     setTimeout(() => {
       let list = [...records]
@@ -124,8 +140,12 @@ export function getRecordList(params = {}) {
   })
 }
 
-/** 获取所有库存（供下拉选择用） */
+/** 获取所有库存（供下拉选择用）
+ * 接口：GET /api/inventory/all
+ * @returns {Promise<object[]>} 完整库存列表（id、goods_id、goods_name、goods_code、unit、quantity）
+ */
 export function getInventoryAll() {
+  // 后端就绪后替换为：return request.get('/inventory/all')
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({ code: 200, msg: '获取成功', data: [...inventory] })
@@ -141,11 +161,13 @@ let nextCheckId = 1
 
 /**
  * 分页查询盘点单列表
+ * 接口：GET /api/stock-check/list
  * @param {{ page?: number, pageSize?: number, status?: string }} params
  *   - status: '进行中' | '已完成' | '已取消'
  * @returns {Promise<{ records: object[], total: number, page: number, pageSize: number }>}
  */
 export function getStockCheckList(params = {}) {
+  // 后端就绪后替换为：return request.get('/stock-check/list', { params })
   return new Promise((resolve) => {
     setTimeout(() => {
       let list = [...stockChecks]
@@ -161,11 +183,13 @@ export function getStockCheckList(params = {}) {
 
 /**
  * 根据 ID 获取盘点单详情（含盘点明细列表）
+ * 接口：GET /api/stock-check/:id
  * @param {number} id
  * @returns {Promise<object>} 盘点单对象，含 id、checkNo、status、createTime、items 数组
  *   - items[]: { goods_id, goodsCode, goodsName, category_id, unit, bookQuantity, actualQuantity, diffQuantity }
  */
 export function getStockCheckById(id) {
+  // 后端就绪后替换为：return request.get(`/stock-check/${id}`)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const item = stockChecks.find((c) => c.id === id)
@@ -180,10 +204,12 @@ export function getStockCheckById(id) {
 
 /**
  * 新建盘点单（自动抓取当前库存数量作为账面数量）
+ * 接口：POST /api/stock-check
  * @returns {Promise<object>} 新建的盘点单对象，含 id、checkNo、status:'进行中'、items 数组
  *   - checkNo 格式: CK + YYYYMMDD + 3位序号，例如 CK20260327001
  */
 export function createStockCheck() {
+  // 后端就绪后替换为：return request.post('/stock-check')
   return new Promise((resolve) => {
     setTimeout(() => {
       const date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
@@ -214,11 +240,13 @@ export function createStockCheck() {
 
 /**
  * 确认盘点单（将实盘数量同步回库存）
+ * 接口：POST /api/stock-check/:id/confirm
  * @param {number} id — 盘点单 ID
  * @param {{ goods_id: number, actualQuantity: number }[]} items — 各物资实盘数量
  * @returns {Promise<null>}
  */
 export function confirmStockCheck(id, items) {
+  // 后端就绪后替换为：return request.post(`/stock-check/${id}/confirm`, { items })
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const check = stockChecks.find((c) => c.id === id)
@@ -231,7 +259,6 @@ export function confirmStockCheck(id, items) {
         if (inv) inv.quantity = actualQuantity
       })
       check.status = '已完成'
-      // TODO: 后端集成时发送 POST /api/stock-check/{id}/confirm 并传入 items 数组
       resolve({ code: 200, msg: '盘点确认成功' })
     }, 500)
   })

@@ -1,6 +1,7 @@
 // src/api/statistics.js — 统计分析 API（当前使用 Mock 数据）
-// 后端集成时：将函数体替换为 request.get 调用。
+// 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
 
+import request from '@/utils/request.js'
 import {
   MOCK_OVERVIEW,
   MOCK_TREND_WEEK,
@@ -11,9 +12,12 @@ import {
 } from '@/constants/wms.js'
 
 /**
- * 统计概览（首页卡片数据）
+ * 统计概览数据（首页卡片）
+ * 接口：GET /api/statistics/overview
+ * @returns {Promise<object>} 含 totalGoods、totalInventory、inboundToday、outboundToday、warningCount 等字段
  */
 export function getOverview() {
+  // 后端就绪后替换为：return request.get('/statistics/overview')
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({ code: 200, msg: '获取成功', data: { ...MOCK_OVERVIEW } })
@@ -22,10 +26,13 @@ export function getOverview() {
 }
 
 /**
- * 出入库趋势
- * @param {{ period: 'week' | 'month' }} params
+ * 出入库趋势数据
+ * 接口：GET /api/statistics/trend
+ * @param {{ period: 'week' | 'month' }} params — 统计周期
+ * @returns {Promise<object>} 含 dates[]、inbound[]、outbound[] 三个并行数组
  */
 export function getTrend(params = {}) {
+  // 后端就绪后替换为：return request.get('/statistics/trend', { params })
   return new Promise((resolve) => {
     setTimeout(() => {
       const data = params.period === 'month' ? MOCK_TREND_MONTH : MOCK_TREND_WEEK
@@ -35,9 +42,12 @@ export function getTrend(params = {}) {
 }
 
 /**
- * 分类占比
+ * 物资分类占比统计
+ * 接口：GET /api/statistics/category
+ * @returns {Promise<object[]>} 分类统计列表，每项含 name、value（库存数量）
  */
 export function getCategoryStats() {
+  // 后端就绪后替换为：return request.get('/statistics/category')
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({ code: 200, msg: '获取成功', data: [...MOCK_CATEGORY_STATS] })
@@ -49,11 +59,13 @@ export function getCategoryStats() {
 
 /**
  * 获取库存预警列表（库存低于 min_stock 的物资）
+ * 接口：GET /api/statistics/warning
  * @param {{ page?: number, pageSize?: number }} params
  * @returns {Promise<{ records: object[], total: number }>}
  *   - records[]: { goods_id, goods_name, goods_code, quantity, min_stock, warehouse_id }
  */
 export function getWarningList(params = {}) {
+  // 后端就绪后替换为：return request.get('/statistics/warning', { params })
   return new Promise((resolve) => {
     setTimeout(() => {
       const list = MOCK_INVENTORY.filter((inv) => {

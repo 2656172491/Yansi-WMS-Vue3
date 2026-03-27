@@ -1,5 +1,7 @@
 // src/api/role.js — 角色管理 API（当前使用 Mock 数据）
-// 后端集成时：将函数体替换为 request.get/post/put/delete 调用，删除 mock 逻辑即可。
+// 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
+
+import request from '@/utils/request.js'
 
 /** Mock 角色列表（运行时可写副本） */
 let roles = [
@@ -81,10 +83,13 @@ const PERMISSION_TREE = [
 
 /**
  * 分页查询角色列表
+ * 接口：GET /api/role/list
  * @param {{ page?: number, pageSize?: number, name?: string, status?: string }} params
  * @returns {Promise<{ records: object[], total: number, page: number, pageSize: number }>}
+ *   - records[]: { id, name, code, desc, permissionCount, status, createTime }
  */
 export function getRoleList(params = {}) {
+  // 后端就绪后替换为：return request.get('/role/list', { params })
   return new Promise((resolve) => {
     setTimeout(() => {
       let list = [...roles]
@@ -101,10 +106,12 @@ export function getRoleList(params = {}) {
 
 /**
  * 根据 ID 获取角色详情（含已分配权限列表）
+ * 接口：GET /api/role/:id
  * @param {number} id
  * @returns {Promise<object>} 角色详情，含 permissions 数组（权限节点 ID 列表）
  */
 export function getRoleById(id) {
+  // 后端就绪后替换为：return request.get(`/role/${id}`)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const item = roles.find((r) => r.id === id)
@@ -121,10 +128,12 @@ export function getRoleById(id) {
 
 /**
  * 新增角色
+ * 接口：POST /api/role
  * @param {{ name: string, code: string, desc?: string, status: string }} data
- * @returns {Promise<object>} 新创建的角色对象
+ * @returns {Promise<object>} 新创建的角色对象（含服务端生成的 id、createTime）
  */
 export function addRole(data) {
+  // 后端就绪后替换为：return request.post('/role', data)
   return new Promise((resolve) => {
     setTimeout(() => {
       const item = {
@@ -142,10 +151,12 @@ export function addRole(data) {
 
 /**
  * 修改角色信息
- * @param {object} data — 必须含 id
+ * 接口：PUT /api/role/:id
+ * @param {object} data — 必须含 id，其余字段同新增
  * @returns {Promise<object>} 更新后的角色对象
  */
 export function updateRole(data) {
+  // 后端就绪后替换为：return request.put(`/role/${data.id}`, data)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const index = roles.findIndex((r) => r.id === data.id)
@@ -161,10 +172,12 @@ export function updateRole(data) {
 
 /**
  * 删除角色
+ * 接口：DELETE /api/role/:id
  * @param {number} id
  * @returns {Promise<null>}
  */
 export function deleteRole(id) {
+  // 后端就绪后替换为：return request.delete(`/role/${id}`)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const index = roles.findIndex((r) => r.id === id)
@@ -182,9 +195,11 @@ export function deleteRole(id) {
 
 /**
  * 获取系统权限树（用于角色授权弹窗）
- * @returns {Promise<object[]>} 树形权限节点列表，每个节点含 id、label、children
+ * 接口：GET /api/role/permission-tree
+ * @returns {Promise<object[]>} 树形权限节点列表，每个节点含 id、label、children?
  */
 export function getPermissionTree() {
+  // 后端就绪后替换为：return request.get('/role/permission-tree')
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({ code: 200, msg: '获取成功', data: PERMISSION_TREE })
@@ -194,11 +209,13 @@ export function getPermissionTree() {
 
 /**
  * 保存角色权限（覆盖已有权限）
+ * 接口：PUT /api/role/:roleId/permissions
  * @param {number} roleId — 角色 ID
  * @param {number[]} permissionIds — 勾选的权限节点 ID 数组（含半选父节点）
  * @returns {Promise<null>}
  */
 export function saveRolePermissions(roleId, permissionIds) {
+  // 后端就绪后替换为：return request.put(`/role/${roleId}/permissions`, { permissionIds })
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const item = roles.find((r) => r.id === roleId)
@@ -208,7 +225,6 @@ export function saveRolePermissions(roleId, permissionIds) {
       }
       item.permissions = [...permissionIds]
       item.permissionCount = permissionIds.length
-      // TODO: 后端集成时发送 PUT /api/role/{roleId}/permissions
       resolve({ code: 200, msg: '权限保存成功' })
     }, 400)
   })

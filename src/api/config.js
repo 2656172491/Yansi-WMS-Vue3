@@ -1,5 +1,7 @@
 // src/api/config.js — 系统参数配置 API（当前使用 Mock 数据）
-// 后端集成时：将函数体替换为 request.get/post 调用，删除 mock 逻辑即可。
+// 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
+
+import request from '@/utils/request.js'
 
 /** Mock 系统默认配置（与 Config.vue 中的 defaultForm 保持一致） */
 const DEFAULT_CONFIG = {
@@ -35,9 +37,16 @@ let currentConfig = { ...DEFAULT_CONFIG }
 
 /**
  * 获取系统参数配置
- * @returns {Promise<object>} 完整的系统配置对象，包含基础信息、仓库参数、安全设置、通知设置等字段
+ * 接口：GET /api/config
+ * @returns {Promise<object>} 完整配置对象，包含：
+ *   基础信息: systemName, systemShortName, version, phone, email, copyright
+ *   仓库参数: defaultWarehouse, warningThreshold, minStockAlert, dataRetentionDays, checkCycleDays,
+ *             allowNegativeStock, enableApproval, enableAutoCheckReminder
+ *   安全设置: loginFailLimit, passwordExpireDays, logRetentionDays, enableTwoFactor, passwordPolicy
+ *   通知设置: notifyInApp, notifyEmail, notifySms, notifyReceiver
  */
 export function getSystemConfig() {
+  // 后端就绪后替换为：return request.get('/config')
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({ code: 200, msg: '获取成功', data: { ...currentConfig } })
@@ -47,14 +56,15 @@ export function getSystemConfig() {
 
 /**
  * 保存系统参数配置
+ * 接口：POST /api/config
  * @param {object} data — 完整或部分配置对象（字段同 getSystemConfig 返回值）
  * @returns {Promise<null>}
  */
 export function saveSystemConfig(data) {
+  // 后端就绪后替换为：return request.post('/config', data)
   return new Promise((resolve) => {
     setTimeout(() => {
       Object.assign(currentConfig, data)
-      // TODO: 后端集成时发送 POST /api/config 并持久化到数据库
       resolve({ code: 200, msg: '保存成功' })
     }, 400)
   })
@@ -62,13 +72,14 @@ export function saveSystemConfig(data) {
 
 /**
  * 恢复系统参数为默认值
- * @returns {Promise<object>} 恢复后的默认配置对象
+ * 接口：POST /api/config/reset
+ * @returns {Promise<object>} 恢复后的默认配置对象（字段同 getSystemConfig 返回值）
  */
 export function resetSystemConfig() {
+  // 后端就绪后替换为：return request.post('/config/reset')
   return new Promise((resolve) => {
     setTimeout(() => {
       currentConfig = { ...DEFAULT_CONFIG }
-      // TODO: 后端集成时发送 POST /api/config/reset
       resolve({ code: 200, msg: '已恢复默认配置', data: { ...currentConfig } })
     }, 400)
   })
