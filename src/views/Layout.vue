@@ -60,9 +60,6 @@
         </div>
 
         <div class="flex items-center gap-4">
-          <el-badge :value="3" class="item cursor-pointer">
-            <el-icon class="text-xl text-gray-600"><Bell /></el-icon>
-          </el-badge>
           <el-dropdown trigger="click">
             <span class="el-dropdown-link flex items-center cursor-pointer text-gray-700">
               <el-avatar
@@ -102,7 +99,7 @@ import {
   Box,
   Odometer,
   Goods,
-  Setting, ArrowDown, Bell
+  Setting, ArrowDown
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
