@@ -84,7 +84,7 @@
           <template #default="{ row }">
             <el-button type="primary" link @click="openDialog('edit', row)">编辑</el-button>
             <el-button type="warning" link @click="openPermissionDialog(row)">分配权限</el-button>
-            <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+            <ConfirmButton :message="`确认删除角色【${row.name}】吗？`" @confirm="handleDeleteConfirm(row)" />
           </template>
         </el-table-column>
       </el-table>
@@ -156,7 +156,8 @@
 <script setup>
 import { computed, reactive, ref } from 'vue'
 import { Search, Refresh, Plus, Key, Stamp, ScaleToOriginal, Tools } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
+import ConfirmButton from '@/components/common/ConfirmButton.vue'
 
 const loading = ref(false)
 const currentPage = ref(1)
@@ -333,15 +334,9 @@ const handleSave = () => {
   dialogVisible.value = false
 }
 
-const handleDelete = (row) => {
-  ElMessageBox.confirm(`确认删除角色【${row.name}】吗？`, '提示', {
-    type: 'warning',
-  })
-      .then(() => {
-        roles.value = roles.value.filter((item) => item.id !== row.id)
-        ElMessage.success('删除成功')
-      })
-      .catch(() => {})
+const handleDeleteConfirm = (row) => {
+  roles.value = roles.value.filter((item) => item.id !== row.id)
+  ElMessage.success('删除成功')
 }
 
 const permissionVisible = ref(false)

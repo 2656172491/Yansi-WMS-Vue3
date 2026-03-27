@@ -73,7 +73,9 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="router.push('/personal-center')">个人中心</el-dropdown-item>
-                <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
+                <ConfirmButton message="确定退出登录？" @confirm="confirmLogout">
+                  <el-dropdown-item divided>退出登录</el-dropdown-item>
+                </ConfirmButton>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -97,16 +99,14 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import {
-  ElMessage,
-  ElMessageBox,
-} from 'element-plus'
+import { ElMessage } from 'element-plus'
 import {
   Box,
   Odometer,
   Goods,
   Setting, ArrowDown
 } from '@element-plus/icons-vue'
+import ConfirmButton from '@/components/common/ConfirmButton.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -220,13 +220,9 @@ const handleMenuSelect = (key) => {
   if (path) router.push(path)
 }
 
-const handleLogout = () => {
-  ElMessageBox.confirm('确定退出登录？', '提示', { type: 'warning' })
-      .then(() => {
-        ElMessage.success('退出成功')
-        router.push('/login')
-      })
-      .catch(() => {})
+const confirmLogout = () => {
+  ElMessage.success('退出成功')
+  router.push('/login')
 }
 </script>
 

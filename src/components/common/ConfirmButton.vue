@@ -1,30 +1,29 @@
 <!-- 确认操作按钮组件 — 执行危险操作前弹出确认框 -->
-<!-- 用法示例：
-  <ConfirmButton :message="`确认删除用户【${row.realName}】吗？`" @confirm="handleDelete(row)">
-    删除
+<!-- 用法示例（使用默认删除按钮）：
+  <ConfirmButton :message="`确认删除用户【${row.realName}】吗？`" @confirm="handleDelete(row)" />
+-->
+<!-- 用法示例（自定义触发元素）：
+  <ConfirmButton message="确定恢复默认配置吗？" @confirm="doReset">
+    <el-button>恢复默认</el-button>
   </ConfirmButton>
 -->
 <template>
-  <el-popconfirm
-    :title="message"
-    :confirm-button-text="confirmText"
-    :cancel-button-text="cancelText"
-    :icon="WarningFilled"
-    icon-color="#f56c6c"
-    @confirm="$emit('confirm')"
-  >
-    <template #reference>
-      <el-button :type="type" :size="size" :icon="icon" link>
-        <slot>删除</slot>
-      </el-button>
-    </template>
-  </el-popconfirm>
+  <span class="confirm-button-wrapper" @click="handleClick" @keydown.enter="handleClick" @keydown.space.prevent="handleClick">
+    <slot>
+      <el-button :type="type" :size="size" :icon="icon" link>删除</el-button>
+    </slot>
+  </span>
 </template>
 
 <script setup>
-import { WarningFilled } from '@element-plus/icons-vue'
+import { ElMessageBox } from 'element-plus'
 
-defineProps({
+const props = defineProps({
+  /** 弹窗标题 */
+  title: {
+    type: String,
+    default: '提示',
+  },
   /** 确认弹窗提示内容 */
   message: {
     type: String,
@@ -40,22 +39,38 @@ defineProps({
     type: String,
     default: '取消',
   },
-  /** 按钮类型（Element Plus button type） */
+  /** 按钮类型（Element Plus button type，仅影响默认 slot 内的按钮） */
   type: {
     type: String,
     default: 'danger',
   },
-  /** 按钮尺寸 */
+  /** 按钮尺寸（仅影响默认 slot 内的按钮） */
   size: {
     type: String,
     default: 'default',
   },
-  /** 按钮图标组件（可选） */
+  /** 按钮图标组件（可选，仅影响默认 slot 内的按钮） */
   icon: {
     type: [Object, Function, String],
     default: undefined,
   },
 })
 
-defineEmits(['confirm'])
+const emit = defineEmits(['confirm', 'cancel'])
+
+const handleClick = () => {
+  ElMessageBox.confirm(props.message, props.title, {
+    type: 'warning',
+    confirmButtonText: props.confirmText,
+    cancelButtonText: props.cancelText,
+  })
+    .then(() => emit('confirm'))
+    .catch(() => emit('cancel'))
+}
 </script>
+
+<style scoped>
+.confirm-button-wrapper {
+  display: contents;
+}
+</style>

@@ -63,7 +63,7 @@
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="openDialog('edit', row)">编辑</el-button>
-            <el-button type="danger"  link size="small" @click="handleDelete(row)">删除</el-button>
+            <ConfirmButton :message="`确认删除物资「${row.name}」？`" size="small" @confirm="handleDeleteConfirm(row)" />
           </template>
         </el-table-column>
       </el-table>
@@ -90,12 +90,13 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
 import { getGoodsList, deleteGoods } from '@/api/goods.js'
 import { CATEGORY_OPTIONS, CATEGORY_MAP } from '@/constants/wms.js'
 import Pagination from '@/components/Pagination.vue'
 import AddEdit from './AddEdit.vue'
+import ConfirmButton from '@/components/common/ConfirmButton.vue'
 
 const loading = ref(false)
 const tableData = ref([])
@@ -145,14 +146,10 @@ const openDialog = (type, row = null) => {
   dialogVisible.value = true
 }
 
-const handleDelete = (row) => {
-  ElMessageBox.confirm(`确认删除物资「${row.name}」？`, '提示', { type: 'warning' })
-    .then(async () => {
-      await deleteGoods(row.id)
-      ElMessage.success('删除成功')
-      loadData()
-    })
-    .catch(() => {})
+const handleDeleteConfirm = async (row) => {
+  await deleteGoods(row.id)
+  ElMessage.success('删除成功')
+  loadData()
 }
 
 onMounted(loadData)

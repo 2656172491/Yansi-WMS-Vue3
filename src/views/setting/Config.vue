@@ -244,7 +244,9 @@
 
     <!-- 操作按钮 -->
     <div class="action-bar">
-      <el-button @click="handleReset">恢复默认</el-button>
+      <ConfirmButton message="确定恢复默认配置吗？" @confirm="doReset">
+        <el-button>恢复默认</el-button>
+      </ConfirmButton>
       <el-button type="primary" @click="handleSave">保存设置</el-button>
     </div>
   </div>
@@ -253,8 +255,9 @@
 <script setup>
 import { reactive, onMounted } from 'vue'
 import { Setting } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { getSystemConfig, saveSystemConfig, resetSystemConfig } from '@/api/config.js'
+import ConfirmButton from '@/components/common/ConfirmButton.vue'
 
 const defaultForm = {
   systemName: 'Yansi WMS',
@@ -300,17 +303,11 @@ const handleSave = () => {
   })
 }
 
-const handleReset = () => {
-  ElMessageBox.confirm('确定恢复默认配置吗？', '提示', {
-    type: 'warning',
+const doReset = () => {
+  resetSystemConfig().then((res) => {
+    Object.assign(formData, res.data)
+    ElMessage.success('已恢复默认配置')
   })
-      .then(() => {
-        resetSystemConfig().then((res) => {
-          Object.assign(formData, res.data)
-          ElMessage.success('已恢复默认配置')
-        })
-      })
-      .catch(() => {})
 }
 </script>
 
