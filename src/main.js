@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
+import './assets/variables.css'
 import './assets/utilities.css'
 // 引入图标库
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'

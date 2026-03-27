@@ -1,73 +1,48 @@
 <template>
   <div class="warehouses-page">
-    <!-- 筛选区 -->
-    <el-card class="filter-card" shadow="never">
-      <template #header>
-        <div class="card-header">
-          <span>仓库管理</span>
-          <el-tag type="info" effect="light">仓库基础信息</el-tag>
-        </div>
+    <!-- 搜索筛选 -->
+    <SearchBar title="仓库管理" tag="仓库基础信息" @search="handleSearch" @reset="handleReset">
+      <el-form-item label="仓库名称">
+        <el-input
+          v-model="queryForm.name"
+          placeholder="请输入仓库名称"
+          clearable
+          class="filter-input"
+        />
+      </el-form-item>
+      <el-form-item label="状态">
+        <el-select
+          v-model="queryForm.status"
+          placeholder="请选择状态"
+          clearable
+          class="filter-input"
+        >
+          <el-option label="启用" value="启用" />
+          <el-option label="停用" value="停用" />
+          <el-option label="维护中" value="维护中" />
+        </el-select>
+      </el-form-item>
+      <template #actions>
+        <el-button type="success" :icon="Plus" @click="openDialog('add')">新增仓库</el-button>
       </template>
-
-      <el-form :inline="true" :model="queryForm" class="filter-form">
-        <el-form-item label="仓库名称">
-          <el-input
-              v-model="queryForm.name"
-              placeholder="请输入仓库名称"
-              clearable
-              class="filter-input"
-          />
-        </el-form-item>
-
-        <el-form-item label="状态">
-          <el-select
-              v-model="queryForm.status"
-              placeholder="请选择状态"
-              clearable
-              class="filter-input"
-          >
-            <el-option label="启用" value="启用" />
-            <el-option label="停用" value="停用" />
-            <el-option label="维护中" value="维护中" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
-          <el-button :icon="Refresh" @click="handleReset">重置</el-button>
-          <el-button type="success" :icon="Plus" @click="openDialog('add')">新增仓库</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+    </SearchBar>
 
     <!-- 统计卡片 -->
     <el-row :gutter="16" class="summary-row">
       <el-col :xs="12" :sm="12" :md="6" v-for="item in summaryCards" :key="item.title">
-        <el-card class="summary-card" shadow="hover">
-          <div class="summary-box">
-            <div class="summary-icon" :class="item.colorClass">
-              <el-icon>
-                <component :is="item.icon" />
-              </el-icon>
-            </div>
-            <div class="summary-info">
-              <div class="summary-title">{{ item.title }}</div>
-              <div class="summary-value">{{ item.value }}</div>
-            </div>
-          </div>
-        </el-card>
+        <StatCard :title="item.title" :value="item.value" :icon="item.icon" :color="item.colorClass" />
       </el-col>
     </el-row>
 
-    <!-- 表格 -->
-    <el-card class="table-card" shadow="never">
-      <template #header>
-        <div class="card-header">
-          <span>仓库列表</span>
-          <span class="table-tip">共 {{ filteredWarehouses.length }} 个仓库</span>
-        </div>
-      </template>
-
+    <!-- 数据表格 -->
+    <DataTable
+      title="仓库列表"
+      :loading="loading"
+      :total="filteredWarehouses.length"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      @update:current-page="handlePageChange"
+    >
       <el-table :data="pagedWarehouses" border stripe v-loading="loading" style="width: 100%">
         <el-table-column prop="name" label="仓库名称" min-width="150" />
         <el-table-column prop="code" label="仓库编码" width="140" />
@@ -79,9 +54,9 @@
         <el-table-column label="容量占比" width="120">
           <template #default="{ row }">
             <el-progress
-                :percentage="getUsagePercent(row)"
-                :stroke-width="8"
-                :status="getUsagePercent(row) >= 90 ? 'exception' : getUsagePercent(row) >= 70 ? 'warning' : 'success'"
+              :percentage="getUsagePercent(row)"
+              :stroke-width="8"
+              :status="getUsagePercent(row) >= 90 ? 'exception' : getUsagePercent(row) >= 70 ? 'warning' : 'success'"
             />
           </template>
         </el-table-column>
@@ -93,28 +68,25 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="170" />
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="openDialog('edit', row)">编辑</el-button>
-            <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+            <ConfirmButton
+              :message="`确认删除仓库【${row.name}】吗？`"
+              @confirm="handleDelete(row)"
+            />
           </template>
         </el-table-column>
       </el-table>
-
-      <div class="pagination-box">
-        <el-pagination
-            background
-            layout="total, prev, pager, next"
-            :total="filteredWarehouses.length"
-            :page-size="pageSize"
-            :current-page="currentPage"
-            @current-change="handlePageChange"
-        />
-      </div>
-    </el-card>
+    </DataTable>
 
     <!-- 新增/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogType === 'add' ? '新增仓库' : '编辑仓库'" width="560px">
+    <FormDialog
+      v-model="dialogVisible"
+      :title="dialogType === 'add' ? '新增仓库' : '编辑仓库'"
+      @confirm="handleSave"
+      @cancel="dialogVisible = false"
+    >
       <el-form :model="formData" label-width="90px">
         <el-form-item label="仓库名称">
           <el-input v-model="formData.name" placeholder="请输入仓库名称" />
@@ -145,19 +117,19 @@
           </el-select>
         </el-form-item>
       </el-form>
-
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSave">保存</el-button>
-      </template>
-    </el-dialog>
+    </FormDialog>
   </div>
 </template>
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
-import { Search, Refresh, Plus, HomeFilled, Location, UserFilled, Box } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus, HomeFilled, Location, UserFilled, Box } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import SearchBar from '@/components/common/SearchBar.vue'
+import StatCard from '@/components/common/StatCard.vue'
+import DataTable from '@/components/common/DataTable.vue'
+import FormDialog from '@/components/common/FormDialog.vue'
+import ConfirmButton from '@/components/common/ConfirmButton.vue'
 
 const loading = ref(false)
 const currentPage = ref(1)
@@ -363,124 +335,30 @@ const handleSave = () => {
 }
 
 const handleDelete = (row) => {
-  ElMessageBox.confirm(`确认删除仓库【${row.name}】吗？`, '提示', {
-    type: 'warning',
-  })
-      .then(() => {
-        warehouses.value = warehouses.value.filter((item) => item.id !== row.id)
-        ElMessage.success('删除成功')
-      })
-      .catch(() => {})
+  warehouses.value = warehouses.value.filter((item) => item.id !== row.id)
+  ElMessage.success('删除成功')
 }
 </script>
 
 <style scoped>
 .warehouses-page {
-  padding: 20px;
-  background: #f5f7fb;
+  padding: var(--page-padding, 20px);
+  background: var(--bg-page, #f5f7fb);
   min-height: 100vh;
   box-sizing: border-box;
 }
 
-.filter-card,
-.table-card {
-  border-radius: 14px;
-  margin-bottom: 16px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  color: #303133;
-}
-
-.filter-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+.summary-row {
+  margin-bottom: var(--card-gap, 16px);
 }
 
 .filter-input {
   width: 220px;
 }
 
-.summary-row {
-  margin-bottom: 16px;
-}
-
-.summary-card {
-  border-radius: 14px;
-}
-
-.summary-box {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.summary-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-}
-
-.summary-icon.blue {
-  background: #e8f3ff;
-  color: #409eff;
-}
-
-.summary-icon.green {
-  background: #ecf9f0;
-  color: #67c23a;
-}
-
-.summary-icon.orange {
-  background: #fff6e8;
-  color: #e6a23c;
-}
-
-.summary-icon.red {
-  background: #fdecec;
-  color: #f56c6c;
-}
-
-.summary-title {
-  font-size: 14px;
-  color: #909399;
-  margin-bottom: 6px;
-}
-
-.summary-value {
-  font-size: 26px;
-  font-weight: 700;
-  color: #303133;
-}
-
-.table-tip {
-  font-size: 13px;
-  color: #909399;
-  font-weight: 400;
-}
-
-.pagination-box {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
-}
-
 @media (max-width: 768px) {
   .filter-input {
     width: 100%;
-  }
-
-  .filter-form {
-    flex-direction: column;
   }
 }
 </style>
