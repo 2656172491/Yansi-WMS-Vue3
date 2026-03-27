@@ -1,0 +1,40 @@
+/* 全局设计令牌 — 颜色、间距、圆角等 */
+:root {
+  /* 品牌 / 语义颜色 */
+  --color-primary: #409eff;
+  --color-success: #67c23a;
+  --color-warning: #e6a23c;
+  --color-danger: #f56c6c;
+  --color-info: #909399;
+
+  /* 文字颜色 */
+  --text-primary: #303133;
+  --text-regular: #606266;
+  --text-secondary: #909399;
+
+  /* 页面背景 */
+  --bg-page: #f5f7fb;
+
+  /* 统计图标块颜色（背景 + 前景） */
+  --stat-blue-bg: #e8f3ff;
+  --stat-blue-fg: #409eff;
+  --stat-green-bg: #ecf9f0;
+  --stat-green-fg: #67c23a;
+  --stat-orange-bg: #fff6e8;
+  --stat-orange-fg: #e6a23c;
+  --stat-red-bg: #fdecec;
+  --stat-red-fg: #f56c6c;
+
+  /* 间距 */
+  --page-padding: 20px;
+  --card-gap: 16px;
+
+  /* 圆角 */
+  --card-radius: 14px;
+  --icon-radius: 14px;
+
+  /* 弹窗宽度预设 */
+  --dialog-width-sm: 480px;
+  --dialog-width-md: 560px;
+  --dialog-width-lg: 720px;
+}
