@@ -76,7 +76,7 @@ const routes = [
         meta: { title: '仓库管理', module: '系统设置' },
       },
       {
-        path: 'setting/goods ',
+        path: 'setting/goods',
         name: 'setting-goods',
         component: () => import('@/views/setting/goods/List.vue'),
         meta: { title: '物资管理', module: '系统设置' },
