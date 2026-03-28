@@ -24,35 +24,36 @@
             </div>
             <div class="mini-stat">
               <span class="mini-label">库存预警</span>
-              <span class="mini-value warning">{{ overview.warningCount }}</span>
+              <span class="mini-value">{{ overview.warningCount }}</span>
             </div>
           </div>
         </div>
 
-        <div class="welcome-illustration">
-          <el-icon class="warehouse-icon"><Box /></el-icon>
-          <div class="illustration-tip">仓库管理工作台</div>
+        <div class="welcome-hero">
+          <el-icon class="welcome-icon">
+            <Box />
+          </el-icon>
         </div>
       </div>
     </el-card>
 
-    <!-- 数据概览 -->
-    <el-row :gutter="16" class="section-row">
+    <!-- 数据卡片 -->
+    <el-row :gutter="20" class="mt-4">
       <el-col
           v-for="card in statCards"
           :key="card.title"
-          :xs="12"
+          :xs="24"
           :sm="12"
           :md="6"
       >
-        <el-card class="stat-card" shadow="hover">
-          <div class="stat-card-body">
+        <el-card class="stat-card" shadow="never">
+          <div class="stat-content">
             <div class="stat-icon" :class="card.colorClass">
               <el-icon>
                 <component :is="card.icon" />
               </el-icon>
             </div>
-            <div class="stat-info">
+            <div>
               <div class="stat-title">{{ card.title }}</div>
               <div class="stat-value">{{ card.value }}</div>
             </div>
@@ -61,60 +62,36 @@
       </el-col>
     </el-row>
 
-    <!-- 快捷入口 -->
-    <el-card class="section-card" shadow="never">
-      <template #header>
-        <div class="section-header">
-          <span>快捷入口</span>
-        </div>
-      </template>
 
-      <el-row :gutter="16">
-        <el-col
-            v-for="item in quickLinks"
-            :key="item.title"
-            :xs="12"
-            :sm="12"
-            :md="6"
-        >
-          <div class="quick-link" @click="handleNavigate(item.path)">
-            <el-icon class="quick-link-icon">
-              <component :is="item.icon" />
-            </el-icon>
-            <div class="quick-link-title">{{ item.title }}</div>
-            <div class="quick-link-desc">{{ item.desc }}</div>
-          </div>
-        </el-col>
-      </el-row>
-    </el-card>
-    <!-- 底部信息 -->
-    <el-row :gutter="16" class="section-row">
-      <el-col :xs="24" :md="12">
+    <el-row :gutter="20"  class="mt-4">
+      <!-- 预警信息 -->
+      <el-col :span="12">
         <el-card class="section-card" shadow="never">
           <template #header>
             <div class="section-header">
-              <span>库存预警</span>
+              <span>预警信息</span>
             </div>
           </template>
 
-          <el-empty
-              v-if="alerts.length === 0"
-              description="暂无预警信息"
-          />
-          <div v-else class="alert-list">
-            <div v-for="item in alerts" :key="item.id" class="alert-item">
+          <div class="alert-list">
+            <div
+                v-for="item in alerts"
+                :key="item.id"
+                class="alert-item"
+            >
               <div class="alert-left">
                 <el-tag :type="item.type" effect="light" size="small">
                   {{ item.label }}
                 </el-tag>
                 <span class="alert-title">{{ item.title }}</span>
               </div>
-              <span class="alert-time">{{ item.time }}</span>
+              <div class="alert-time">{{ item.time }}</div>
             </div>
           </div>
         </el-card>
       </el-col>
 
+      <!-- 最近动态 -->
       <el-col :xs="24" :md="12">
         <el-card class="section-card" shadow="never">
           <template #header>
@@ -123,16 +100,18 @@
             </div>
           </template>
 
-          <el-timeline>
-            <el-timeline-item
-                v-for="item in activities"
-                :key="item.id"
-                :timestamp="item.time"
-                :type="item.type"
-            >
-              {{ item.content }}
-            </el-timeline-item>
-          </el-timeline>
+          <div class="alert-list">
+            <el-timeline>
+              <el-timeline-item
+                  v-for="item in activities"
+                  :key="item.id"
+                  :timestamp="item.time"
+                  :type="item.type"
+              >
+                {{ item.content }}
+              </el-timeline-item>
+            </el-timeline>
+          </div>
         </el-card>
       </el-col>
     </el-row>
@@ -141,12 +120,10 @@
 
 <script setup>
 import {computed, markRaw, onMounted, reactive, ref} from 'vue'
-import { useRouter } from 'vue-router'
-import { Box, Goods, Download, Upload, List, Bell } from '@element-plus/icons-vue'
-import { getOverview } from '@/api/statistics.js'
+import { Box, Goods, Download, Upload, Bell } from '@element-plus/icons-vue'
+import { getOverview, getQuickLinks, getAlerts, getActivities } from '@/api/home.js'
 import { useAuthStore } from '@/store/index.js'
 
-const router = useRouter()
 const authStore = useAuthStore()
 
 const userName = computed(() => authStore.realName || '管理员')
@@ -175,50 +152,19 @@ const statCards = ref([
   { title: '库存预警', value: '0', icon: markRaw(Bell), colorClass: 'red' },
 ])
 
-const quickLinks = [
-  {
-    title: '物资列表',
-    desc: '查看全部物资信息',
-    icon: Goods,
-    path: '/goods/list',
-  },
-  {
-    title: '入库管理',
-    desc: '登记入库记录',
-    icon: Download,
-    path: '/inventory/inbound',
-  },
-  {
-    title: '出库管理',
-    desc: '处理出库业务',
-    icon: Upload,
-    path: '/inventory/outbound',
-  },
-  {
-    title: '库存盘点',
-    desc: '进行库存核对',
-    icon: List,
-    path: '/inventory/stock-check',
-  },
-]
+const quickLinks = ref([])
+const alerts = ref([])
+const activities = ref([])
 
-const alerts = ref([
-  { id: 1, label: '预警', type: 'danger', title: 'A区货架库存不足', time: '10 分钟前' },
-  { id: 2, label: '提醒', type: 'warning', title: 'B类物资即将临期', time: '1 小时前' },
-  { id: 3, label: '通知', type: 'success', title: '今日盘点任务已完成', time: '今天 09:20' },
-])
+const loadHomeData = async () => {
+  const [overviewRes, quickLinksRes, alertsRes, activitiesRes] = await Promise.all([
+    getOverview(),
+    getQuickLinks(),
+    getAlerts(),
+    getActivities(),
+  ])
 
-const activities = ref([
-  { id: 1, type: 'primary', content: '管理员完成了 12 条入库记录', time: '今天 09:30' },
-  { id: 2, type: 'success', content: '出库申请已审核通过', time: '今天 10:05' },
-  { id: 3, type: 'warning', content: '发现 3 条库存预警信息', time: '今天 11:10' },
-  { id: 4, type: 'info', content: '系统数据同步完成', time: '今天 12:00' },
-])
-
-// 加载概览数据
-const loadOverviewData = async () => {
-  const res = await getOverview()
-  const d = res.data
+  const d = overviewRes.data
   overview.totalGoods = d.totalGoods
   overview.todayInbound = d.todayInbound
   overview.todayOutbound = d.todayOutbound
@@ -230,15 +176,13 @@ const loadOverviewData = async () => {
     { title: '今日出库', value: String(d.todayOutbound), icon: Upload, colorClass: 'orange' },
     { title: '库存预警', value: String(d.warningCount), icon: Bell, colorClass: 'red' },
   ]
-}
 
-// 路由跳转
-const handleNavigate = (path) => {
-  router.push(path)
+  quickLinks.value = quickLinksRes.data
+  alerts.value = alertsRes.data
+  activities.value = activitiesRes.data
 }
-
 onMounted(async () => {
-  await loadOverviewData()
+  await loadHomeData()
 })
 </script>
 
@@ -252,8 +196,6 @@ onMounted(async () => {
 
 .welcome-card {
   border-radius: 16px;
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, #e8f3ff 0%, #f8fbff 100%);
 }
 
 .welcome-content {
@@ -263,33 +205,39 @@ onMounted(async () => {
   gap: 24px;
 }
 
+.welcome-text {
+  flex: 1;
+}
+
 .title-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .title-row h2 {
   margin: 0;
-  font-size: 24px;
-  color: #1f2d3d;
+  color: #303133;
 }
 
 .subtitle {
-  margin: 0 0 18px;
+  margin: 12px 0 18px;
   color: #606266;
-  line-height: 1.7;
+  line-height: 1.8;
 }
 
 .welcome-stats {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .mini-stat {
-  min-width: 100px;
+  min-width: 110px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
 }
 
 .mini-label {
@@ -305,30 +253,23 @@ onMounted(async () => {
   color: #303133;
 }
 
-.mini-value.warning {
-  color: #f56c6c;
-}
-
-.welcome-illustration {
+.welcome-hero {
+  width: 120px;
+  height: 120px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #ecf5ff 0%, #f0f9ff 100%);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 160px;
+  flex-shrink: 0;
 }
 
-.warehouse-icon {
-  font-size: 72px;
+.welcome-icon {
+  font-size: 52px;
   color: #409eff;
-  margin-bottom: 8px;
 }
 
-.illustration-tip {
-  color: #606266;
-  font-size: 14px;
-}
-
-.section-row {
+.mt-4 {
   margin-top: 16px;
 }
 
@@ -336,7 +277,7 @@ onMounted(async () => {
   border-radius: 14px;
 }
 
-.stat-card-body {
+.stat-content {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -364,9 +305,28 @@ onMounted(async () => {
   color: #303133;
 }
 
+.stat-icon.blue {
+  background: #ecf5ff;
+  color: #409eff;
+}
+
+.stat-icon.green {
+  background: #f0f9ff;
+  color: #67c23a;
+}
+
+.stat-icon.orange {
+  background: #fdf6ec;
+  color: #e6a23c;
+}
+
+.stat-icon.red {
+  background: #fef0f0;
+  color: #f56c6c;
+}
+
 .section-card {
   border-radius: 14px;
-  margin-top: 16px;
 }
 
 .section-header {
@@ -377,43 +337,27 @@ onMounted(async () => {
   color: #303133;
 }
 
-.quick-link {
-  padding: 18px 14px;
-  border-radius: 12px;
-  background: #f7f9fc;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
-}
-
-.quick-link:hover {
-  transform: translateY(-2px);
-  background: #ecf5ff;
-  box-shadow: 0 8px 20px rgba(64, 158, 255, 0.12);
-}
-
-.quick-link-icon {
-  font-size: 26px;
-  color: #409eff;
-  margin-bottom: 10px;
-}
-
-.quick-link-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #303133;
-  margin-bottom: 6px;
-}
-
-.quick-link-desc {
-  font-size: 13px;
-  color: #909399;
-}
-
 .alert-list {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  max-height: 244px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* 美化滚动条（可选） */
+.alert-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.alert-list::-webkit-scrollbar-thumb {
+  background: #dcdfe6;
+  border-radius: 999px;
+}
+
+.alert-list::-webkit-scrollbar-thumb:hover {
+  background: #c0c4cc;
 }
 
 .alert-item {
@@ -449,26 +393,18 @@ onMounted(async () => {
     align-items: flex-start;
   }
 
-  .welcome-illustration {
+  .welcome-hero {
+    width: 90px;
+    height: 90px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+
+  .alert-item {
+    flex-direction: column;
     align-items: flex-start;
   }
-}
-
-/* 给统计卡片图标补充颜色（原代码缺失） */
-.stat-icon.blue {
-  background: #ecf5ff;
-  color: #409eff;
-}
-.stat-icon.green {
-  background: #f0f9ff;
-  color: #67c23a;
-}
-.stat-icon.orange {
-  background: #fdf6ec;
-  color: #e6a23c;
-}
-.stat-icon.red {
-  background: #fef0f0;
-  color: #f56c6c;
 }
 </style>
