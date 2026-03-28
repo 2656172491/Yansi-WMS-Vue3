@@ -23,7 +23,6 @@ const routes = [
         component: Home,
         meta: { title: '首页', module: '首页' },
       },
-
       // 统计概览
       {
         path: 'statistics/dashboard',
@@ -31,15 +30,6 @@ const routes = [
         component: () => import('@/views/statistics/Dashboard.vue'),
         meta: { title: '工作台', module: '统计概览' },
       },
-
-      // 物资管理
-      {
-        path: 'goods/list',
-        name: 'goods-list',
-        component: () => import('@/views/goods/List.vue'),
-        meta: { title: '物资列表', module: '物资管理' },
-      },
-
       // 库存管理
       {
         path: 'inventory/list',
@@ -86,10 +76,10 @@ const routes = [
         meta: { title: '仓库管理', module: '系统设置' },
       },
       {
-        path: 'setting/config',
-        name: 'setting-config',
-        component: () => import('@/views/setting/Config.vue'),
-        meta: { title: '系统参数', module: '系统设置' },
+        path: 'setting/goods ',
+        name: 'setting-goods',
+        component: () => import('@/views/setting/goods/List.vue'),
+        meta: { title: '物资管理', module: '系统设置' },
       },
       {
         path: 'setting/logs',
@@ -97,7 +87,6 @@ const routes = [
         component: () => import('@/views/setting/Logs.vue'),
         meta: { title: '操作日志', module: '系统设置' },
       },
-
       // 个人中心
       {
         path: 'personal-center',

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="dashboard-page">
     <!-- 统计卡片 -->
     <el-row :gutter="16" class="section-row">
       <el-col
@@ -25,52 +25,56 @@
       </el-col>
     </el-row>
 
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="section-row">
       <!-- 出入库趋势 -->
-      <el-col :span="16">
-        <el-card shadow="never">
+      <el-col :xs="24" :lg="16">
+        <el-card class="panel-card" shadow="never">
           <template #header>
-            <div class="flex justify-between items-center">
-              <span class="font-bold">出入库趋势</span>
+            <div class="panel-header">
+              <span class="panel-title">出入库趋势</span>
               <el-radio-group v-model="chartPeriod" size="small" @change="loadTrend">
-                <el-radio-button value="week">本周</el-radio-button>
-                <el-radio-button value="month">本月</el-radio-button>
+                <el-radio-button label="week">本周</el-radio-button>
+                <el-radio-button label="month">本月</el-radio-button>
               </el-radio-group>
             </div>
           </template>
-          <div ref="trendChartRef" style="height: 320px" />
+
+          <div ref="trendChartRef" class="chart-box" />
         </el-card>
       </el-col>
 
       <!-- 分类占比 -->
-      <el-col :span="8">
-        <el-card shadow="never">
+      <el-col :xs="24" :lg="8">
+        <el-card class="panel-card" shadow="never">
           <template #header>
-            <span class="font-bold">物资分类占比</span>
+            <span class="panel-title">物资分类占比</span>
           </template>
-          <div ref="categoryChartRef" style="height: 320px" />
+
+          <div ref="categoryChartRef" class="chart-box" />
         </el-card>
       </el-col>
     </el-row>
 
     <!-- 预警信息 -->
-    <el-card shadow="never" class="mt-4">
+    <el-card class="panel-card warning-panel" shadow="never">
       <template #header>
-        <span class="font-bold">预警信息</span>
+        <span class="panel-title">预警信息</span>
       </template>
-      <AlertsPanel :alerts="alerts" />
+
+      <div class="warning-scroll">
+        <AlertsPanel :alerts="alerts" />
+      </div>
     </el-card>
   </div>
 </template>
 
 <script setup>
-import {ref, onMounted, onUnmounted, markRaw} from 'vue'
+import { ref, onMounted, onUnmounted, markRaw, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import { getOverview, getTrend, getCategoryStats } from '@/api/statistics.js'
 import AlertsPanel from '@/components/AlertsPanel.vue'
-import { Bell, Download, Goods, Upload } from "@element-plus/icons-vue"
+import { Bell, Download, Goods, Upload } from '@element-plus/icons-vue'
 
-// ── 统计卡片 ──────────────────────────────────────────────
 const alerts = ref([
   { id: 1, label: '预警', type: 'danger', title: 'A区货架库存不足', time: '10 分钟前' },
   { id: 2, label: '提醒', type: 'warning', title: 'B类物资即将临期', time: '1 小时前' },
@@ -84,60 +88,76 @@ const statCards = ref([
   { title: '库存预警', value: '0', icon: markRaw(Bell), colorClass: 'red' },
 ])
 
-// 加载概览数据（修复：补上你缺失的方法）
 const loadOverview = async () => {
   try {
     const res = await getOverview()
-    const d = res.data
+    const d = res.data || {}
     statCards.value = [
-      { title: '物资总数', value: String(d.totalGoods || 0), icon: Goods, colorClass: 'blue' },
-      { title: '今日入库', value: String(d.todayInbound || 0), icon: Download, colorClass: 'green' },
-      { title: '今日出库', value: String(d.todayOutbound || 0), icon: Upload, colorClass: 'orange' },
-      { title: '库存预警', value: String(d.warningCount || 0), icon: Bell, colorClass: 'red' },
+      { title: '物资总数', value: String(d.totalGoods ?? 0), icon: markRaw(Goods), colorClass: 'blue' },
+      { title: '今日入库', value: String(d.todayInbound ?? 0), icon: markRaw(Download), colorClass: 'green' },
+      { title: '今日出库', value: String(d.todayOutbound ?? 0), icon: markRaw(Upload), colorClass: 'orange' },
+      { title: '库存预警', value: String(d.warningCount ?? 0), icon: markRaw(Bell), colorClass: 'red' },
     ]
   } catch (e) {
     console.log('获取统计数据失败', e)
   }
 }
 
-// ── 趋势折线图 ────────────────────────────────────────────
 const trendChartRef = ref(null)
 let trendChart = null
 const chartPeriod = ref('week')
 
-const initTrendChart = () => {
+const initTrendChart = async () => {
+  await nextTick()
   trendChart = echarts.init(trendChartRef.value)
 }
 
 const loadTrend = async () => {
   try {
     const res = await getTrend({ period: chartPeriod.value })
-    const { dates, inbound, outbound } = res.data
+    const { dates = [], inbound = [], outbound = [] } = res.data || {}
+
     trendChart?.setOption({
       tooltip: { trigger: 'axis' },
       legend: { data: ['入库', '出库'] },
-      xAxis: { type: 'category', data: dates, boundaryGap: false },
-      yAxis: { type: 'value' },
+      grid: { left: 40, right: 20, top: 40, bottom: 30 },
+      xAxis: {
+        type: 'category',
+        data: dates,
+        boundaryGap: false,
+      },
+      yAxis: {
+        type: 'value',
+      },
       series: [
         {
-          name: '入库', type: 'line', data: inbound, smooth: true,
-          itemStyle: { color: '#67C23A' }, areaStyle: { opacity: 0.1 },
+          name: '入库',
+          type: 'line',
+          data: inbound,
+          smooth: true,
+          itemStyle: { color: '#67C23A' },
+          areaStyle: { opacity: 0.1 },
         },
         {
-          name: '出库', type: 'line', data: outbound, smooth: true,
-          itemStyle: { color: '#E6A23C' }, areaStyle: { opacity: 0.1 },
+          name: '出库',
+          type: 'line',
+          data: outbound,
+          smooth: true,
+          itemStyle: { color: '#E6A23C' },
+          areaStyle: { opacity: 0.1 },
         },
       ],
-      grid: { left: 40, right: 20, top: 40, bottom: 30 },
     })
-  } catch (e) {}
+  } catch (e) {
+    console.log('获取趋势数据失败', e)
+  }
 }
 
-// ── 分类饼图 ──────────────────────────────────────────────
 const categoryChartRef = ref(null)
 let categoryChart = null
 
-const initCategoryChart = () => {
+const initCategoryChart = async () => {
+  await nextTick()
   categoryChart = echarts.init(categoryChartRef.value)
 }
 
@@ -152,15 +172,22 @@ const loadCategoryStats = async () => {
           type: 'pie',
           radius: ['40%', '70%'],
           center: ['60%', '50%'],
-          data: res.data,
-          emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.5)' } },
+          data: res.data || [],
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0,0,0,0.5)',
+            },
+          },
         },
       ],
     })
-  } catch (e) {}
+  } catch (e) {
+    console.log('获取分类数据失败', e)
+  }
 }
 
-// ── 生命周期 ──────────────────────────────────────────────
 const onResize = () => {
   trendChart?.resize()
   categoryChart?.resize()
@@ -168,8 +195,8 @@ const onResize = () => {
 
 onMounted(async () => {
   await loadOverview()
-  initTrendChart()
-  initCategoryChart()
+  await initTrendChart()
+  await initCategoryChart()
   await Promise.all([loadTrend(), loadCategoryStats()])
   window.addEventListener('resize', onResize)
 })
@@ -181,7 +208,14 @@ onUnmounted(() => {
 })
 </script>
 
-<style>
+<style scoped>
+.dashboard-page {
+  padding: 20px;
+  box-sizing: border-box;
+  background: #f5f7fb;
+  min-height: 100%;
+}
+
 .section-row {
   margin-bottom: 16px;
 }
@@ -204,6 +238,11 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   font-size: 24px;
+  flex-shrink: 0;
+}
+
+.stat-info {
+  min-width: 0;
 }
 
 .stat-title {
@@ -222,33 +261,79 @@ onUnmounted(() => {
   background: #ecf5ff;
   color: #409eff;
 }
+
 .stat-icon.green {
   background: #f0f9ff;
   color: #67c23a;
 }
+
 .stat-icon.orange {
   background: #fdf6ec;
   color: #e6a23c;
 }
+
 .stat-icon.red {
   background: #fef0f0;
   color: #f56c6c;
 }
 
-.mt-4 {
+.panel-card {
+  border-radius: 14px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.panel-title {
+  font-weight: 700;
+  color: #303133;
+}
+
+.chart-box {
+  height: 340px;
+  width: 100%;
+}
+
+.warning-panel {
   margin-top: 16px;
 }
 
-.flex {
-  display: flex;
+.warning-scroll {
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 6px;
 }
-.justify-between {
-  justify-content: space-between;
+
+/* 美化滚动条 */
+.warning-scroll::-webkit-scrollbar {
+  width: 6px;
 }
-.items-center {
-  align-items: center;
+
+.warning-scroll::-webkit-scrollbar-thumb {
+  background: #dcdfe6;
+  border-radius: 999px;
 }
-.font-bold {
-  font-weight: bold;
+
+.warning-scroll::-webkit-scrollbar-thumb:hover {
+  background: #c0c4cc;
+}
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 14px;
+  }
+
+  .chart-box {
+    height: 280px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
 }
 </style>

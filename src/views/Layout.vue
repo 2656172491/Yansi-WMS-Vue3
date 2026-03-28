@@ -151,12 +151,6 @@ const sidebarMenus = [
     ],
   },
   {
-    index: 'goods',
-    title: '物资管理',
-    icon: Goods,
-    path: '/goods/list',
-  },
-  {
     index: 'setting',
     title: '系统管理',
     icon: Setting,
@@ -177,14 +171,15 @@ const sidebarMenus = [
         path: '/setting/warehouses',
       },
       {
+        index: 'goods',
+        title: '物资管理',
+        icon: Goods,
+        path: '/setting/goods',
+      },
+      {
         index: 'log',
         title: '操作日志',
         path: '/setting/logs',
-      },
-      {
-        index: 'setting-config',
-        title: '系统参数',
-        path: '/setting/config',
       },
     ],
   },

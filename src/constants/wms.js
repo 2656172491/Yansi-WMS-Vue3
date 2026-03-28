@@ -74,10 +74,9 @@ export const MOCK_RECORDS = [
 // ===================== 统计概览数据 =====================
 export const MOCK_OVERVIEW = {
   totalGoods: 5,
-  totalInventory: 391,
   todayInbound: 86,
   todayOutbound: 52,
-  warningCount: 2,   // 笔记本电脑 & 液压搬运车低于最小库存
+  warningCount: 2,
 }
 
 // ===================== 出入库趋势（近7天 Mock）=====================
