@@ -55,7 +55,12 @@
             <component :is="isCollapse ? 'Expand' : 'Fold'" />
           </el-icon>
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item>{{ currentBreadcrumb }}</el-breadcrumb-item>
+            <el-breadcrumb-item
+                v-for="(item, index) in breadcrumbs"
+                :key="index"
+            >
+              {{ item.title }}
+            </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
 
@@ -210,7 +215,19 @@ const activeMenu = computed(() => {
 })
 
 // 面包屑
-const currentBreadcrumb = computed(() => route.meta?.title || '页面')
+const breadcrumbs = computed(() => {
+  const title = route.meta?.title || '页面'
+  const module = route.meta?.module
+
+  if (module) {
+    return [
+      { title: module },
+      { title },
+    ]
+  }
+
+  return [{ title }]
+})
 
 // UI 状态
 const isCollapse = ref(false)
