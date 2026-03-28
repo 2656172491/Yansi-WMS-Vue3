@@ -64,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import {ref, onMounted, onUnmounted, markRaw} from 'vue'
 import * as echarts from 'echarts'
 import { getOverview, getTrend, getCategoryStats } from '@/api/statistics.js'
 import AlertsPanel from '@/components/AlertsPanel.vue'
@@ -78,10 +78,10 @@ const alerts = ref([
 ])
 
 const statCards = ref([
-  { title: '物资总数', value: '0', icon: Goods, colorClass: 'blue' },
-  { title: '今日入库', value: '0', icon: Download, colorClass: 'green' },
-  { title: '今日出库', value: '0', icon: Upload, colorClass: 'orange' },
-  { title: '库存预警', value: '0', icon: Bell, colorClass: 'red' },
+  { title: '物资总数', value: '0', icon: markRaw(Goods), colorClass: 'blue' },
+  { title: '今日入库', value: '0', icon: markRaw(Download), colorClass: 'green' },
+  { title: '今日出库', value: '0', icon: markRaw(Upload), colorClass: 'orange' },
+  { title: '库存预警', value: '0', icon: markRaw(Bell), colorClass: 'red' },
 ])
 
 // 加载概览数据（修复：补上你缺失的方法）

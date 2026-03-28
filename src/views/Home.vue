@@ -140,7 +140,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import {computed, markRaw, onMounted, reactive, ref} from 'vue'
 import { useRouter } from 'vue-router'
 import { Box, Goods, Download, Upload, List, Bell } from '@element-plus/icons-vue'
 import { getOverview } from '@/api/statistics.js'
@@ -169,10 +169,10 @@ const overview = reactive({
 })
 
 const statCards = ref([
-  { title: '物资总数', value: '0', icon: Goods, colorClass: 'blue' },
-  { title: '今日入库', value: '0', icon: Download, colorClass: 'green' },
-  { title: '今日出库', value: '0', icon: Upload, colorClass: 'orange' },
-  { title: '库存预警', value: '0', icon: Bell, colorClass: 'red' },
+  { title: '物资总数', value: '0', icon: markRaw(Goods), colorClass: 'blue' },
+  { title: '今日入库', value: '0', icon: markRaw(Download), colorClass: 'green' },
+  { title: '今日出库', value: '0', icon: markRaw(Upload), colorClass: 'orange' },
+  { title: '库存预警', value: '0', icon: markRaw(Bell), colorClass: 'red' },
 ])
 
 const quickLinks = [

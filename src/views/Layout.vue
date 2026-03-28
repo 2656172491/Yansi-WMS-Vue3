@@ -17,7 +17,7 @@
           text-color="#bfcbd9"
           active-text-color="#409EFF"
           :collapse="isCollapse"
-          unique-opened="true"
+          :unique-opened="true"
           @select="handleMenuSelect"
       >
         <template v-for="item in sidebarMenus" :key="item.index">
