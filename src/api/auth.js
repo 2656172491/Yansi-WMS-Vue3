@@ -26,7 +26,13 @@ export function login(data) {
  */
 export function logout() {
   // 后端就绪后替换为：return request.post('/auth/logout')
-  return null
+  return axios({
+    url: '/api/auth/logout',
+    method: 'POST',
+    data:{
+      username: JSON.parse(localStorage.getItem('userInfo'))['username'],
+    }
+  })
 }
 
 /**

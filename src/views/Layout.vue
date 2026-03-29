@@ -72,7 +72,7 @@
                   src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
                   class="mr-2"
               />
-              管理员
+              {{ username }}
               <el-icon class="el-icon--right"><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
@@ -100,7 +100,7 @@
 </template>
 
 <script setup>
-import {ref, computed, onMounted} from 'vue'
+import {ref, computed} from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   ElMessage,
@@ -116,7 +116,7 @@ import * as auth from "@/api/auth.js";
 
 const router = useRouter()
 const route = useRoute()
-
+const username = JSON.parse(localStorage.getItem('userInfo'))['username']
 const sidebarMenus = [
   {
     index: 'dashboard',
@@ -236,20 +236,14 @@ const handleMenuSelect = (key) => {
 const handleLogout = () => {
   ElMessageBox.confirm('确定退出登录？', '提示', { type: 'warning' })
       .then(() => {
+        auth.logout()
         ElMessage.success('退出成功')
+        localStorage.removeItem('userInfo')
+        localStorage.removeItem('token')
         router.push('/login')
       })
       .catch(() => {})
 }
-
-onMounted(async () => {
-  try {
-    const res = await auth.getUserInfo("首页")
-    localStorage.setItem("userInfo", JSON.stringify(res.data.data))
-  } catch (err) {
-    console.log("获取用户信息失败", err)
-  }
-})
 </script>
 
 <style scoped>

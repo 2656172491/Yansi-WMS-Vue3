@@ -59,6 +59,7 @@ import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import {login} from "@/api/auth.js";
+import * as auth from "@/api/auth.js";
 
 const router = useRouter();
 
@@ -110,7 +111,15 @@ const handleLogin = async () => {
       }
       ElMessage.success("登录成功！");
 
-      // 4. 跳转页面 ✅ 关键！
+      // 4. 获取用户信息并保存
+      try {
+        const res = await auth.getUserInfo("登录页")
+        localStorage.setItem("userInfo", JSON.stringify(res.data.data))
+      } catch (err) {
+        console.log("获取用户信息失败", err)
+      }
+
+      // 5. 跳转页面 ✅ 关键！
       await router.push("/home"); // 或者 /home
     }else {
       console.error("登录失败", res.data.message);
