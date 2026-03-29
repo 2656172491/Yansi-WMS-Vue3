@@ -3,7 +3,6 @@
 
 import request from '@/utils/request.js'
 import {
-  MOCK_OVERVIEW,
   MOCK_TREND_WEEK,
   MOCK_TREND_MONTH,
   MOCK_CATEGORY_STATS,
@@ -18,10 +17,9 @@ import {
  */
 export function getOverview() {
   // 后端就绪后替换为：return request.get('/statistics/overview')
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ code: 200, msg: '获取成功', data: { ...MOCK_OVERVIEW } })
-    }, 300)
+  return request({
+    url: '/statistics/overview',
+    method: 'GET',
   })
 }
 

@@ -56,15 +56,15 @@
     </el-row>
 
     <!-- 预警信息 -->
-    <el-card class="panel-card warning-panel" shadow="never">
-      <template #header>
-        <span class="panel-title">预警信息</span>
-      </template>
+<!--    <el-card class="panel-card warning-panel" shadow="never">-->
+<!--      <template #header>-->
+<!--        <span class="panel-title">预警信息</span>-->
+<!--      </template>-->
 
-      <div class="warning-scroll">
-        <AlertsPanel :alerts="alerts" />
-      </div>
-    </el-card>
+<!--      <div class="warning-scroll">-->
+<!--        <AlertsPanel :alerts="alerts" />-->
+<!--      </div>-->
+<!--    </el-card>-->
   </div>
 </template>
 
@@ -72,14 +72,7 @@
 import { ref, onMounted, onUnmounted, markRaw, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import { getOverview, getTrend, getCategoryStats } from '@/api/statistics.js'
-import AlertsPanel from '@/components/AlertsPanel.vue'
 import { Bell, Download, Goods, Upload } from '@element-plus/icons-vue'
-
-const alerts = ref([
-  { id: 1, label: '预警', type: 'danger', title: 'A区货架库存不足', time: '10 分钟前' },
-  { id: 2, label: '提醒', type: 'warning', title: 'B类物资即将临期', time: '1 小时前' },
-  { id: 3, label: '通知', type: 'success', title: '今日盘点任务已完成', time: '今天 09:20' },
-])
 
 const statCards = ref([
   { title: '物资总数', value: '0', icon: markRaw(Goods), colorClass: 'blue' },
@@ -93,10 +86,10 @@ const loadOverview = async () => {
     const res = await getOverview()
     const d = res.data || {}
     statCards.value = [
-      { title: '物资总数', value: String(d.totalGoods ?? 0), icon: markRaw(Goods), colorClass: 'blue' },
-      { title: '今日入库', value: String(d.todayInbound ?? 0), icon: markRaw(Download), colorClass: 'green' },
-      { title: '今日出库', value: String(d.todayOutbound ?? 0), icon: markRaw(Upload), colorClass: 'orange' },
-      { title: '库存预警', value: String(d.warningCount ?? 0), icon: markRaw(Bell), colorClass: 'red' },
+      { title: '物资总数', value: d.CountGoods ?? 0, icon: markRaw(Goods), colorClass: 'blue' },
+      { title: '今日入库', value: d.TodayInGoods ?? 0, icon: markRaw(Download), colorClass: 'green' },
+      { title: '今日出库', value: d.todayOutbound ?? 0, icon: markRaw(Upload), colorClass: 'orange' },
+      { title: '库存预警', value: d.InventoryWarning, icon: markRaw(Bell), colorClass: 'red' },
     ]
   } catch (e) {
     console.log('获取统计数据失败', e)
@@ -297,30 +290,6 @@ onUnmounted(() => {
 .chart-box {
   height: 340px;
   width: 100%;
-}
-
-.warning-panel {
-  margin-top: 16px;
-}
-
-.warning-scroll {
-  max-height: 320px;
-  overflow-y: auto;
-  padding-right: 6px;
-}
-
-/* 美化滚动条 */
-.warning-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.warning-scroll::-webkit-scrollbar-thumb {
-  background: #dcdfe6;
-  border-radius: 999px;
-}
-
-.warning-scroll::-webkit-scrollbar-thumb:hover {
-  background: #c0c4cc;
 }
 
 @media (max-width: 768px) {

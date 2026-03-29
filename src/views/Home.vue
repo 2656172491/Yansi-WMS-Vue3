@@ -16,15 +16,15 @@
           <div class="welcome-stats">
             <div class="mini-stat">
               <span class="mini-label">今日入库</span>
-              <span class="mini-value">{{ overview.todayInbound }}</span>
+              <span class="mini-value">{{ overview.TodayInGoods }}</span>
             </div>
             <div class="mini-stat">
               <span class="mini-label">今日出库</span>
-              <span class="mini-value">{{ overview.todayOutbound }}</span>
+              <span class="mini-value">{{ overview.TodayOutGoods }}</span>
             </div>
             <div class="mini-stat">
               <span class="mini-label">库存预警</span>
-              <span class="mini-value">{{ overview.warningCount }}</span>
+              <span class="mini-value">{{ overview.InventoryWarning }}</span>
             </div>
           </div>
         </div>
@@ -64,35 +64,8 @@
 
 
     <el-row :gutter="20"  class="mt-4">
-      <!-- 预警信息 -->
-      <el-col :span="12">
-        <el-card class="section-card" shadow="never">
-          <template #header>
-            <div class="section-header">
-              <span>预警信息</span>
-            </div>
-          </template>
-
-          <div class="alert-list">
-            <div
-                v-for="item in alerts"
-                :key="item.id"
-                class="alert-item"
-            >
-              <div class="alert-left">
-                <el-tag :type="item.type" effect="light" size="small">
-                  {{ item.label }}
-                </el-tag>
-                <span class="alert-title">{{ item.title }}</span>
-              </div>
-              <div class="alert-time">{{ item.time }}</div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-
       <!-- 最近动态 -->
-      <el-col :xs="24" :md="12">
+      <el-col>
         <el-card class="section-card" shadow="never">
           <template #header>
             <div class="section-header">
@@ -121,13 +94,15 @@
 <script setup>
 import {computed, markRaw, onMounted, reactive, ref} from 'vue'
 import { Box, Goods, Download, Upload, Bell } from '@element-plus/icons-vue'
-import { getOverview, getQuickLinks, getAlerts, getActivities } from '@/api/home.js'
+import {getActivities } from '@/api/home.js'
 import {useUserStore} from "@/store/user.js";
+import {getOverview} from "@/api/statistics.js";
 
 const userStore = useUserStore()
 
 const userName = userStore.userInfo.username
 
+// 获取当前时间
 const todayText = computed(() => {
   const date = new Date()
   return date.toLocaleDateString('zh-CN', {
@@ -138,11 +113,12 @@ const todayText = computed(() => {
   })
 })
 
+
 const overview = reactive({
-  totalGoods: 0,
-  todayInbound: 0,
-  todayOutbound: 0,
-  warningCount: 0,
+  CountGoods: 0,
+  TodayInGoods: 0,
+  TodayOutGoods: 0,
+  InventoryWarning: 0,
 })
 
 const statCards = ref([
@@ -152,33 +128,27 @@ const statCards = ref([
   { title: '库存预警', value: '0', icon: markRaw(Bell), colorClass: 'red' },
 ])
 
-const quickLinks = ref([])
-const alerts = ref([])
 const activities = ref([])
 
 const loadHomeData = async () => {
-  const [overviewRes, quickLinksRes, alertsRes, activitiesRes] = await Promise.all([
+  const [overviewRes, activitiesRes] = await Promise.all([
     getOverview(),
-    getQuickLinks(),
-    getAlerts(),
     getActivities(),
   ])
 
   const d = overviewRes.data
-  overview.totalGoods = d.totalGoods
-  overview.todayInbound = d.todayInbound
-  overview.todayOutbound = d.todayOutbound
-  overview.warningCount = d.warningCount
+  overview.CountGoods = d.CountGoods
+  overview.TodayInGoods = d.TodayInGoods
+  overview.TodayOutGoods = d.TodayOutGoods
+  overview.InventoryWarning = d.InventoryWarning
 
   statCards.value = [
-    { title: '物资总数', value: String(d.totalGoods), icon: Goods, colorClass: 'blue' },
-    { title: '今日入库', value: String(d.todayInbound), icon: Download, colorClass: 'green' },
-    { title: '今日出库', value: String(d.todayOutbound), icon: Upload, colorClass: 'orange' },
-    { title: '库存预警', value: String(d.warningCount), icon: Bell, colorClass: 'red' },
+    { title: '物资总数', value: String(d.CountGoods), icon: Goods, colorClass: 'blue' },
+    { title: '今日入库', value: String(d.TodayInGoods), icon: Download, colorClass: 'green' },
+    { title: '今日出库', value: String(d.TodayOutGoods), icon: Upload, colorClass: 'orange' },
+    { title: '库存预警', value: String(d.InventoryWarning), icon: Bell, colorClass: 'red' },
   ]
 
-  quickLinks.value = quickLinksRes.data
-  alerts.value = alertsRes.data
   activities.value = activitiesRes.data
 }
 onMounted(async () => {
@@ -360,32 +330,6 @@ onMounted(async () => {
   background: #c0c4cc;
 }
 
-.alert-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: #fafafa;
-}
-
-.alert-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.alert-title {
-  color: #303133;
-}
-
-.alert-time {
-  color: #909399;
-  font-size: 13px;
-  white-space: nowrap;
-}
 
 @media (max-width: 768px) {
   .welcome-content {
@@ -400,11 +344,6 @@ onMounted(async () => {
 
   .stat-value {
     font-size: 22px;
-  }
-
-  .alert-item {
-    flex-direction: column;
-    align-items: flex-start;
   }
 }
 </style>
