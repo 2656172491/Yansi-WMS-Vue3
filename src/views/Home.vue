@@ -123,8 +123,7 @@ import {computed, markRaw, onMounted, reactive, ref} from 'vue'
 import { Box, Goods, Download, Upload, Bell } from '@element-plus/icons-vue'
 import { getOverview, getQuickLinks, getAlerts, getActivities } from '@/api/home.js'
 
-const userName = '管理员'
-
+const userName = JSON.parse(localStorage.getItem('userInfo'))['username']
 const todayText = computed(() => {
   const date = new Date()
   return date.toLocaleDateString('zh-CN', {

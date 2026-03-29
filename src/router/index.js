@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { isLoggedIn } from '../utils/auth.js'
 
 import Login from '../views/Login.vue'
 import Layout from '../views/Layout.vue'
@@ -115,8 +114,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const loggedIn = isLoggedIn()
-
+  const loggedIn = localStorage.getItem('token')
   if (!loggedIn && to.path !== '/login') {
     return '/login'
   }

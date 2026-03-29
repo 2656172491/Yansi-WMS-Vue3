@@ -58,7 +58,7 @@
 import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-import { login } from "@/api/auth.js";
+import {login} from "@/api/auth.js";
 
 const router = useRouter();
 
@@ -99,7 +99,7 @@ const handleLogin = async () => {
       password: loginForm.password
     });
 
-    if(res.data.code === 0) {
+    if(res.data.code === 200) {
       // 2. 后端返回成功
       console.log("登录成功", res.data);
 

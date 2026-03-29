@@ -1,4 +1,3 @@
-// src/api/auth.js — 认证模块 API（当前使用 Mock 数据）
 // 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
 
 import axios from "axios";
@@ -35,7 +34,14 @@ export function logout() {
  * 接口：GET /api/auth/me
  * @returns {Promise<object>} 当前用户的 id、username、realName、role 等字段
  */
-export function getUserInfo() {
-  // 后端就绪后替换为：return request.get('/auth/me')
-  return null
+export function getUserInfo(module) {
+  return axios({
+    url: '/api/auth/me',
+    method: 'GET',
+    // GET 用 params 而不是 data
+    params: {
+      token: localStorage.getItem('token'),
+      module: module
+    }
+  })
 }

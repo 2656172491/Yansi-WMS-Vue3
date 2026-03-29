@@ -100,7 +100,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import {ref, computed, onMounted} from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   ElMessage,
@@ -112,6 +112,7 @@ import {
   Goods,
   Setting, ArrowDown
 } from '@element-plus/icons-vue'
+import * as auth from "@/api/auth.js";
 
 const router = useRouter()
 const route = useRoute()
@@ -240,6 +241,15 @@ const handleLogout = () => {
       })
       .catch(() => {})
 }
+
+onMounted(async () => {
+  try {
+    const res = await auth.getUserInfo("首页")
+    localStorage.setItem("userInfo", JSON.stringify(res.data.data))
+  } catch (err) {
+    console.log("获取用户信息失败", err)
+  }
+})
 </script>
 
 <style scoped>
