@@ -89,7 +89,6 @@ const loginRules = reactive({
 });
 
 const handleLogin = async () => {
-  try {
     const valid = await loginFormRef.value.validate();
     if (!valid) return;
     isLoading.value = true;
@@ -100,26 +99,26 @@ const handleLogin = async () => {
       password: loginForm.password
     });
 
-    // 2. 后端返回成功
-    console.log("登录成功", res.data);
+    if(res.data.code === 0) {
+      // 2. 后端返回成功
+      console.log("登录成功", res.data);
 
-    // 3. 这里要存 token（必须加！）
-    if (res.data.data) {
-      // 假设后端返回的 token 在 res.data.data
-      localStorage.setItem("wms_token", res.data.data);
+      // 3. 这里要存 token（必须加！）
+      if (res.data.data) {
+        // 假设后端返回的 token 在 res.data.data
+        localStorage.setItem("token", res.data.data);
+      }
+      ElMessage.success("登录成功！");
+
+      // 4. 跳转页面 ✅ 关键！
+      await router.push("/home"); // 或者 /home
+    }else {
+      console.error("登录失败", res.data.message);
+      ElMessage.error("登录失败：" + (res.data.message));
     }
 
-    ElMessage.success("登录成功！");
-
-    // 4. 跳转页面 ✅ 关键！
-    router.push("/home"); // 或者 /home
-
-  } catch (error) {
-    console.error("登录失败", error);
-    ElMessage.error("登录失败：" + (error?.message || "用户名或密码错误"));
-  } finally {
     isLoading.value = false;
-  }
+
 };
 </script>
 

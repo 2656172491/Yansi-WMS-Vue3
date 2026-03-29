@@ -1,7 +1,7 @@
 // src/utils/auth.js — 认证工具函数（Token 存取）
 
-const TOKEN_KEY = 'wms_token'
-const USER_KEY = 'wms_user'
+const TOKEN_KEY = 'token'
+const USER_KEY = 'user'
 
 /** 获取 Token */
 export function getToken() {
