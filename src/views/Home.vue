@@ -79,7 +79,6 @@
                   v-for="item in activities"
                   :key="item.id"
                   :timestamp="item.time"
-                  :type="item.type"
               >
                 {{ item.content }}
               </el-timeline-item>
