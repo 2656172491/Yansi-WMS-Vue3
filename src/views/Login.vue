@@ -59,9 +59,10 @@ import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import {login} from "@/api/auth.js";
-import * as auth from "@/api/auth.js";
+import {useUserStore} from "@/store/user.js";
 
 const router = useRouter();
+const userStore = useUserStore()
 
 const loginFormRef = ref(null);
 const isLoading = ref(false);
@@ -99,31 +100,26 @@ const handleLogin = async () => {
       username: loginForm.username,
       password: loginForm.password
     });
-
-    if(res.data.code === 200) {
+    console.log(res);
+    if(res.code === 200) {
       // 2. 后端返回成功
       console.log("登录成功", res.data);
 
       // 3. 这里要存 token（必须加！）
-      if (res.data.data) {
         // 假设后端返回的 token 在 res.data.data
-        localStorage.setItem("token", res.data.data);
-      }
+      userStore.login({
+        token: res.data.token,
+        userInfo: res.data.userInfo,
+      })
       ElMessage.success("登录成功！");
 
-      // 4. 获取用户信息并保存
-      try {
-        const res = await auth.getUserInfo("登录页")
-        localStorage.setItem("userInfo", JSON.stringify(res.data.data))
-      } catch (err) {
-        console.log("获取用户信息失败", err)
-      }
 
-      // 5. 跳转页面 ✅ 关键！
+      console.log(localStorage.getItem("token"));
+      // 4. 跳转页面 ✅ 关键！
       await router.push("/home"); // 或者 /home
     }else {
-      console.error("登录失败", res.data.message);
-      ElMessage.error("登录失败：" + (res.data.message));
+      console.error("登录失败", res.message);
+      ElMessage.error("登录失败：" + (res.message));
     }
 
     isLoading.value = false;

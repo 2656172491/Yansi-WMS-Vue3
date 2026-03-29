@@ -22,14 +22,12 @@ const routes = [
         component: Home,
         meta: { title: '首页', module: '首页' },
       },
-      // 统计概览
       {
         path: 'statistics/dashboard',
         name: 'statistics-dashboard',
         component: () => import('@/views/statistics/Dashboard.vue'),
         meta: { title: '工作台', module: '统计概览' },
       },
-      // 库存管理
       {
         path: 'inventory/list',
         name: 'inventory-list',
@@ -54,8 +52,6 @@ const routes = [
         component: () => import('@/views/inventory/Outbound.vue'),
         meta: { title: '出库管理', module: '库存管理' },
       },
-
-      // 系统设置
       {
         path: 'setting/users',
         name: 'setting-users',
@@ -86,7 +82,6 @@ const routes = [
         component: () => import('@/views/setting/Logs.vue'),
         meta: { title: '操作日志', module: '系统设置' },
       },
-      // 个人中心
       {
         path: 'personal-center',
         name: 'personal-center',
@@ -95,8 +90,6 @@ const routes = [
       },
     ],
   },
-
-  // 404
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
@@ -113,17 +106,23 @@ const router = createRouter({
   },
 })
 
+// ✅ 正确写法：在守卫内部导入 useUserStore
 router.beforeEach((to) => {
-  const loggedIn = localStorage.getItem('token')
-  if (!loggedIn && to.path !== '/login') {
-    return '/login'
+  const user = JSON.parse(localStorage.getItem('user'))
+  const token = user['token'];
+
+  // 已登录访问登录页 → 跳首页
+  if (token && to.path === '/login') {
+    return '/'
   }
 
-  if (loggedIn && to.path === '/login') {
-    return '/'
+  // 未登录访问非登录页 → 去登录
+  if (!token && to.path !== '/login') {
+    return '/login'
   }
 
   return true
 })
+
 
 export default router

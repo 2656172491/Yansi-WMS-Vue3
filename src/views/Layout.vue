@@ -113,10 +113,13 @@ import {
   Setting, ArrowDown
 } from '@element-plus/icons-vue'
 import * as auth from "@/api/auth.js";
+import {useUserStore} from "@/store/user.js";
 
 const router = useRouter()
 const route = useRoute()
-const username = JSON.parse(localStorage.getItem('userInfo'))['username']
+const userStore = useUserStore()
+
+const username = userStore.userInfo.username
 const sidebarMenus = [
   {
     index: 'dashboard',
@@ -238,8 +241,7 @@ const handleLogout = () => {
       .then(() => {
         auth.logout()
         ElMessage.success('退出成功')
-        localStorage.removeItem('userInfo')
-        localStorage.removeItem('token')
+        userStore.logout()
         router.push('/login')
       })
       .catch(() => {})
