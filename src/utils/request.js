@@ -36,11 +36,29 @@ service.interceptors.request.use((config) => {
 // 响应拦截器（必须完整写）
 service.interceptors.response.use(
     (response) => {
-        // 直接返回后台的数据，不再返回整个 axios 包装对象
-        return response.data
+        const res = response.data
+
+        // 🔥【关键】后端成功：code == 200
+        if (res.code === 200) {
+            // 直接返回数据，页面只用拿 res.data
+            return res
+        }
+
+        // 🔥 后端失败：其他状态码
+        ElMessage.error(res.message || '请求失败')
+        return Promise.reject(new Error(res.message || 'Error'))
     },
     (error) => {
-        ElMessage.error(error.message || '请求失败')
+        // HTTP 状态码错误（404、500、401、403）
+        ElMessage.error(error.message || '网络异常/服务器错误')
+
+        // 🔥 自动处理 token 过期/未授权
+        if (error.response?.status === 401) {
+            const userStore = useUserStore()
+            userStore.logout()
+            router.push('/login')
+        }
+
         return Promise.reject(error)
     }
 )
