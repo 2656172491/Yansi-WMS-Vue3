@@ -122,11 +122,8 @@
 import {computed, markRaw, onMounted, reactive, ref} from 'vue'
 import { Box, Goods, Download, Upload, Bell } from '@element-plus/icons-vue'
 import { getOverview, getQuickLinks, getAlerts, getActivities } from '@/api/home.js'
-import { useAuthStore } from '@/store/index.js'
 
-const authStore = useAuthStore()
-
-const userName = computed(() => authStore.realName || '管理员')
+const userName = '管理员'
 
 const todayText = computed(() => {
   const date = new Date()

@@ -35,7 +35,6 @@
         <el-form-item>
           <div class="form-actions">
             <el-checkbox v-model="loginForm.remember">记住我</el-checkbox>
-            <!-- <el-link type="primary" class="forgot-password" underline="never">忘记密码？</el-link> -->
           </div>
         </el-form-item>
         <el-form-item>
@@ -59,10 +58,9 @@
 import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-import { useAuthStore } from "@/store/index.js";
+import { login } from "@/api/auth.js";
 
 const router = useRouter();
-const authStore = useAuthStore();
 
 const loginFormRef = ref(null);
 const isLoading = ref(false);
@@ -95,11 +93,30 @@ const handleLogin = async () => {
     const valid = await loginFormRef.value.validate();
     if (!valid) return;
     isLoading.value = true;
-    await authStore.login({ username: loginForm.username, password: loginForm.password });
+
+    // 1. 调用登录接口
+    const res = await login({
+      username: loginForm.username,
+      password: loginForm.password
+    });
+
+    // 2. 后端返回成功
+    console.log("登录成功", res.data);
+
+    // 3. 这里要存 token（必须加！）
+    if (res.data.data) {
+      // 假设后端返回的 token 在 res.data.data
+      localStorage.setItem("wms_token", res.data.data);
+    }
+
     ElMessage.success("登录成功！");
-    router.push("/home");
+
+    // 4. 跳转页面 ✅ 关键！
+    router.push("/home"); // 或者 /home
+
   } catch (error) {
-    ElMessage.error(error?.message || "用户名或密码错误！");
+    console.error("登录失败", error);
+    ElMessage.error("登录失败：" + (error?.message || "用户名或密码错误"));
   } finally {
     isLoading.value = false;
   }
@@ -159,11 +176,5 @@ const handleLogin = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-.forgot-password {
-  margin-left: auto;
-  font-size: 14px;
-  text-decoration: none;
-  color: #409eff;
 }
 </style>

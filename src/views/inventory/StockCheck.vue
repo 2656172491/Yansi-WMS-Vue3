@@ -107,10 +107,7 @@
 import { ref, reactive, computed } from 'vue'
 import { Plus, Check, Download } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { useAuthStore } from '@/store/index.js'
 import { MOCK_INVENTORY, MOCK_GOODS, CATEGORY_MAP } from '@/constants/wms.js'
-
-const authStore = useAuthStore()
 
 // 当前盘点单
 const currentCheck = reactive({
@@ -199,7 +196,7 @@ const handleConfirmCheck = () => {
     id: Date.now(),
     checkNo: currentCheck.checkNo,
     createTime: new Date().toLocaleString('zh-CN', { hour12: false }),
-    checker: authStore.realName || '管理员',
+    checker:  '管理员',
     statusText: '已完成',
   })
 }
