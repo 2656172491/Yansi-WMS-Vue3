@@ -6,7 +6,7 @@
 一个基于 **Vue 3 + Vite** 开发的仓库管理系统前端项目，用于实现物资管理、库存管理、出入库记录、统计分析等功能。
 
 ## 📊 项目统计
-![代码行数](https://img.shields.io/tokei/lines/github/2656172491/Yansi-WMS-Vue3?label=总代码行数&color=42b983)
+![代码总行数](https://api.codetabs.com/v1/badge?github=2656172491/Yansi-WMS-Vue3)
 ![文件数量](https://img.shields.io/github/directory-file-count/2656172491/Yansi-WMS-Vue3?label=文件总数)
 ![代码大小](https://img.shields.io/github/languages/code-size/2656172491/Yansi-WMS-Vue3?label=代码大小)
 ![Vue](https://img.shields.io/badge/Vue-3-%234FC08D?style=flat&logo=vue.js)
