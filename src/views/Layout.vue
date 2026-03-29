@@ -238,10 +238,10 @@ const handleMenuSelect = (key) => {
 
 const handleLogout = () => {
   ElMessageBox.confirm('确定退出登录？', '提示', { type: 'warning' })
-      .then(() => {
-        auth.logout()
-        ElMessage.success('退出成功')
+      .then(async () => {
+        await auth.logout()
         userStore.logout()
+        ElMessage.success('退出成功')
         router.push('/login')
       })
       .catch(() => {})

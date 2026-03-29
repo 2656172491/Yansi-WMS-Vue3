@@ -1,7 +1,6 @@
 import axios from 'axios'
-import { ElMessage } from "element-plus";
+import { ElMessage } from "element-plus"
 import router from '@/router'
-import { useUserStore } from '@/store/user.js'
 
 const service = axios.create({
     baseURL: '/api',
@@ -10,58 +9,58 @@ const service = axios.create({
 
 const TOKEN_LIVE_TIME = 6 * 60 * 60 * 1000 // 6小时过期
 
-// 请求拦截器（你写的是对的）
+// ✅ 请求拦截器（稳定、不报错、自动带token）
 service.interceptors.request.use((config) => {
-    const userStore = useUserStore()
-    const token = userStore.token
+    // 1. 从本地拿 user（永远能拿到）
+    const userStr = localStorage.getItem('user')
+    if (!userStr) return config
 
-    if (token) {
+    const user = JSON.parse(userStr)
+    const token = user.token
+    const loginTime = user.loginDate
+
+    // 2. 过期判断
+    if (token && loginTime) {
         const now = Date.now()
-        const loginTime = parseInt(userStore.loginDate)
-
-        // 过期判断
         if (now - loginTime > TOKEN_LIVE_TIME) {
-            userStore.logout()
+            localStorage.removeItem('user')
             ElMessage.error('登录已过期')
             router.push('/login')
-            return Promise.reject()
+            return Promise.reject('登录过期')
         }
 
-        config.headers.Authorization = `Bearer ${token}`
+        // ✅ 自动把 token 放入请求头
+        config.headers.Authorization = token
     }
+
     return config
 })
 
-// ===================== 这里是重点！你之前没写！=====================
-// 响应拦截器（必须完整写）
+// ✅ 响应拦截器（按code=200判断）
 service.interceptors.response.use(
     (response) => {
         const res = response.data
 
-        // 🔥【关键】后端成功：code == 200
+        // 后端成功
         if (res.code === 200) {
-            // 直接返回数据，页面只用拿 res.data
             return res
         }
 
-        // 🔥 后端失败：其他状态码
+        // 后端失败
         ElMessage.error(res.message || '请求失败')
-        return Promise.reject(new Error(res.message || 'Error'))
+        return Promise.reject(res)
     },
     (error) => {
-        // HTTP 状态码错误（404、500、401、403）
-        ElMessage.error(error.message || '网络异常/服务器错误')
+        ElMessage.error(error.message || '网络异常')
 
-        // 🔥 自动处理 token 过期/未授权
+        // 401 未授权 / token过期
         if (error.response?.status === 401) {
-            const userStore = useUserStore()
-            userStore.logout()
+            localStorage.removeItem('user')
             router.push('/login')
         }
 
         return Promise.reject(error)
     }
 )
-// =================================================================
 
 export default service

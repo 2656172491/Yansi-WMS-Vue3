@@ -113,8 +113,6 @@ const handleLogin = async () => {
       })
       ElMessage.success("登录成功！");
 
-
-      console.log(localStorage.getItem("token"));
       // 4. 跳转页面 ✅ 关键！
       await router.push("/home"); // 或者 /home
     }else {
