@@ -27,7 +27,7 @@
 
     <el-row :gutter="20" class="section-row">
       <!-- 出入库趋势 -->
-      <el-col :xs="24" :lg="16">
+      <el-col>
         <el-card class="panel-card" shadow="never">
           <template #header>
             <div class="panel-header">
@@ -42,36 +42,14 @@
           <div ref="trendChartRef" class="chart-box" />
         </el-card>
       </el-col>
-
-      <!-- 分类占比 -->
-      <el-col :xs="24" :lg="8">
-        <el-card class="panel-card" shadow="never">
-          <template #header>
-            <span class="panel-title">物资分类占比</span>
-          </template>
-
-          <div ref="categoryChartRef" class="chart-box" />
-        </el-card>
-      </el-col>
     </el-row>
-
-    <!-- 预警信息 -->
-<!--    <el-card class="panel-card warning-panel" shadow="never">-->
-<!--      <template #header>-->
-<!--        <span class="panel-title">预警信息</span>-->
-<!--      </template>-->
-
-<!--      <div class="warning-scroll">-->
-<!--        <AlertsPanel :alerts="alerts" />-->
-<!--      </div>-->
-<!--    </el-card>-->
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, markRaw, nextTick } from 'vue'
 import * as echarts from 'echarts'
-import { getOverview, getTrend, getCategoryStats } from '@/api/statistics.js'
+import { getOverview, getTrend} from '@/api/statistics.js'
 import { Bell, Download, Goods, Upload } from '@element-plus/icons-vue'
 
 const statCards = ref([
@@ -143,58 +121,20 @@ const loadTrend = async () => {
     })
 }
 
-const categoryChartRef = ref(null)
-let categoryChart = null
-
-const initCategoryChart = async () => {
-  await nextTick()
-  categoryChart = echarts.init(categoryChartRef.value)
-}
-
-const loadCategoryStats = async () => {
-  try {
-    const res = await getCategoryStats()
-    categoryChart?.setOption({
-      tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
-      legend: { orient: 'vertical', left: 'left', top: 'middle' },
-      series: [
-        {
-          type: 'pie',
-          radius: ['40%', '70%'],
-          center: ['60%', '50%'],
-          data: res.data || [],
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0,0,0,0.5)',
-            },
-          },
-        },
-      ],
-    })
-  } catch (e) {
-    console.log('获取分类数据失败', e)
-  }
-}
-
 const onResize = () => {
   trendChart?.resize()
-  categoryChart?.resize()
 }
 
 onMounted(async () => {
   await loadOverview()
   await initTrendChart()
-  await initCategoryChart()
-  await Promise.all([loadTrend(), loadCategoryStats()])
+  await Promise.all(loadTrend())
   window.addEventListener('resize', onResize)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', onResize)
   trendChart?.dispose()
-  categoryChart?.dispose()
 })
 </script>
 
