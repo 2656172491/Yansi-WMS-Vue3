@@ -108,8 +108,9 @@ const router = createRouter({
 
 // ✅ 正确写法：在守卫内部导入 useUserStore
 router.beforeEach((to) => {
-  const user = JSON.parse(localStorage.getItem('user'))
-  const token = user['token'];
+  const userStr = localStorage.getItem('user')
+  const user = userStr ? JSON.parse(userStr) : null
+  const token = user ? user.token : null
 
   // 已登录访问登录页 → 跳首页
   if (token && to.path === '/login') {

@@ -79,19 +79,6 @@ export const MOCK_OVERVIEW = {
   warningCount: 2,
 }
 
-// ===================== 出入库趋势（近7天 Mock）=====================
-export const MOCK_TREND_WEEK = {
-  dates: ['03-18', '03-19', '03-20', '03-21', '03-22', '03-23', '03-24'],
-  inbound:  [30, 45, 28, 60, 35, 50, 86],
-  outbound: [20, 38, 22, 45, 28, 40, 52],
-}
-
-export const MOCK_TREND_MONTH = {
-  dates: ['03-01','03-05','03-10','03-15','03-20','03-24'],
-  inbound:  [120, 200, 180, 150, 220, 86],
-  outbound: [90, 160, 130, 120, 180, 52],
-}
-
 // ===================== 分类占比（统计用）=====================
 export const MOCK_CATEGORY_STATS = [
   { name: '电子产品', value: 23 },

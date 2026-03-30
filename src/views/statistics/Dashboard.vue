@@ -106,8 +106,8 @@ const initTrendChart = async () => {
 }
 
 const loadTrend = async () => {
-  try {
     const res = await getTrend({ period: chartPeriod.value })
+    console.log(res.data)
     const { dates = [], inbound = [], outbound = [] } = res.data || {}
 
     trendChart?.setOption({
@@ -141,9 +141,6 @@ const loadTrend = async () => {
         },
       ],
     })
-  } catch (e) {
-    console.log('获取趋势数据失败', e)
-  }
 }
 
 const categoryChartRef = ref(null)

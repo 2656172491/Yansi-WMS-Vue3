@@ -3,8 +3,6 @@
 
 import request from '@/utils/request.js'
 import {
-  MOCK_TREND_WEEK,
-  MOCK_TREND_MONTH,
   MOCK_CATEGORY_STATS,
   MOCK_INVENTORY,
   MOCK_GOODS,
@@ -29,13 +27,11 @@ export function getOverview() {
  * @param {{ period: 'week' | 'month' }} params — 统计周期
  * @returns {Promise<object>} 含 dates[]、inbound[]、outbound[] 三个并行数组
  */
-export function getTrend(params = {}) {
-  // 后端就绪后替换为：return request.get('/statistics/trend', { params })
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const data = params.period === 'month' ? MOCK_TREND_MONTH : MOCK_TREND_WEEK
-      resolve({ code: 200, msg: '获取成功', data: { ...data } })
-    }, 300)
+export function getTrend(params={}) {
+  return request({
+    url: '/statistics/trends',
+    method: 'GET',
+    params: params,
   })
 }
 
