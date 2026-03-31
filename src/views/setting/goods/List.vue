@@ -32,6 +32,7 @@
       </el-form>
     </el-card>
 
+
     <!-- 操作栏 + 表格 -->
     <el-card shadow="never">
       <div class="mb-4 flex justify-between items-center">
@@ -50,16 +51,9 @@
         <el-table-column prop="price"         label="单价(元)"   width="100">
           <template #default="{ row }">{{ Number(row.price).toFixed(2) }}</template>
         </el-table-column>
-        <el-table-column prop="min_stock"     label="预警下限"   width="90"  />
-        <el-table-column prop="max_stock"     label="预警上限"   width="90"  />
-        <el-table-column label="状态" width="80">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
-              {{ row.status === 1 ? '启用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" width="160" />
+        <el-table-column prop="minStock"     label="预警下限"   width="90"  />
+        <el-table-column prop="maxStock"     label="预警上限"   width="90"  />
+        <el-table-column prop="createTime" label="创建时间" width="160" />
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="openDialog('edit', row)">编辑</el-button>
@@ -116,7 +110,7 @@ const loadData = async () => {
       pageSize: pageSize.value,
       ...searchForm,
     })
-    tableData.value = res.data.records
+    tableData.value = res.data.rows
     total.value = res.data.total
   } finally {
     loading.value = false

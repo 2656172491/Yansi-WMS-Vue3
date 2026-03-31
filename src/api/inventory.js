@@ -1,7 +1,6 @@
 // src/api/inventory.js — 库存管理 API（当前使用 Mock 数据）
 // 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
 
-import request from '@/utils/request.js'
 import { MOCK_INVENTORY, MOCK_RECORDS } from '@/constants/wms.js'
 
 // 运行时可写副本
@@ -18,21 +17,7 @@ let nextRecordId = Math.max(...records.map((r) => r.id)) + 1
  * @returns {Promise<{ records: object[], total: number, page: number, pageSize: number }>}
  *   - records[]: { id, goods_id, goods_name, goods_code, category_id, unit, warehouse_id, quantity }
  */
-export function getInventoryList(params = {}) {
-  // 后端就绪后替换为：return request.get('/inventory/list', { params })
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      let list = [...inventory]
-      if (params.goods_name) list = list.filter((i) => i.goods_name.includes(params.goods_name))
-      if (params.goods_code) list = list.filter((i) => i.goods_code.includes(params.goods_code))
-      const page = params.page || 1
-      const pageSize = params.pageSize || 10
-      const total = list.length
-      const records = list.slice((page - 1) * pageSize, page * pageSize)
-      resolve({ code: 200, msg: '获取成功', data: { records, total, page, pageSize } })
-    }, 300)
-  })
-}
+
 
 // ===================== 入库 =====================
 

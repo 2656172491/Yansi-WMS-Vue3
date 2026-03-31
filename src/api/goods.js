@@ -2,54 +2,19 @@
 // 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
 
 import request from '@/utils/request.js'
-import { MOCK_GOODS, MOCK_CATEGORIES } from '@/constants/wms.js'
+import { MOCK_GOODS } from '@/constants/wms.js'
 
 // 本地可写副本（运行时增删改）
 let goods = [...MOCK_GOODS.map((g) => ({ ...g }))]
 let nextId = Math.max(...goods.map((g) => g.id)) + 1
 
-// ===================== 物资分类 =====================
 
-/**
- * 获取物资分类列表
- * 接口：GET /api/goods/category
- * @returns {Promise<object[]>} 分类列表，每项含 id、name、code、sort
- */
-export function getCategoryList() {
-  // 后端就绪后替换为：return request.get('/goods/category')
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ code: 200, msg: '获取成功', data: [...MOCK_CATEGORIES] })
-    }, 200)
-  })
-}
-
-// ===================== 物资 CRUD =====================
-
-/**
- * 分页查询物资列表
- * 接口：GET /api/goods/list
- * @param {{ page?: number, pageSize?: number, name?: string, code?: string, category_id?: number, status?: number }} params
- * @returns {Promise<{ records: object[], total: number, page: number, pageSize: number }>}
- *   - records[]: { id, name, code, category_id, specification, unit, price, min_stock, max_stock, status, create_time }
- */
 export function getGoodsList(params = {}) {
-  // 后端就绪后替换为：return request.get('/goods/list', { params })
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      let list = [...goods]
-      if (params.name) list = list.filter((g) => g.name.includes(params.name))
-      if (params.code) list = list.filter((g) => g.code.includes(params.code))
-      if (params.category_id) list = list.filter((g) => g.category_id === params.category_id)
-      if (params.status !== undefined && params.status !== '') {
-        list = list.filter((g) => g.status === Number(params.status))
-      }
-      const page = params.page || 1
-      const pageSize = params.pageSize || 10
-      const total = list.length
-      const records = list.slice((page - 1) * pageSize, page * pageSize)
-      resolve({ code: 200, msg: '获取成功', data: { records, total, page, pageSize } })
-    }, 300)
+  // 后端就绪后替换为：return request.get('/inventory/list', { params })
+  return request({
+    url: '/goods',
+    method: 'GET',
+    params: params,
   })
 }
 

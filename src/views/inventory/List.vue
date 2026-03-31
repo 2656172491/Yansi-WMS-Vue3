@@ -23,15 +23,15 @@
       </template>
 
       <el-table :data="tableData" v-loading="loading" border stripe style="width: 100%">
-        <el-table-column prop="goods_code" label="物资编码" width="130" />
-        <el-table-column prop="goods_name" label="物资名称" min-width="140" />
+        <el-table-column prop="code" label="物资编码" width="130" />
+        <el-table-column prop="name" label="物资名称" min-width="140" />
         <el-table-column label="分类" width="110">
-          <template #default="{ row }">{{ categoryMap[row.category_id] || '-' }}</template>
+          <template #default="{ row }">{{ categoryMap[row.id] || '-' }}</template>
         </el-table-column>
         <el-table-column prop="unit" label="单位" width="70" />
-        <el-table-column prop="quantity" label="当前库存" width="100">
+        <el-table-column prop="status" label="当前库存" width="100">
           <template #default="{ row }">
-            <el-tag :type="getStockTagType(row)" size="small">{{ row.quantity }}</el-tag>
+            <el-tag :type="getStockTagType(row)" size="small">{{ row.status }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="库存状态" width="100">
@@ -55,9 +55,9 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { Search, Refresh } from '@element-plus/icons-vue'
-import { getInventoryList } from '@/api/inventory.js'
-import { CATEGORY_MAP, MOCK_GOODS } from '@/constants/wms.js'
+import { CATEGORY_MAP } from '@/constants/wms.js'
 import Pagination from '@/components/Pagination.vue'
+import {getGoodsList} from "@/api/goods.js";
 
 const loading = ref(false)
 const tableData = ref([])
@@ -69,24 +69,37 @@ const categoryMap = CATEGORY_MAP
 const searchForm = reactive({ goods_name: '', goods_code: '' })
 
 // 从物资数据中快速查找预警值
-const goodsMinStockMap = Object.fromEntries(MOCK_GOODS.map((g) => [g.id, g.min_stock]))
+const goodsMinStockMap = ref({})
 
 const loadData = async () => {
   loading.value = true
   try {
-    const res = await getInventoryList({
+    const res = await getGoodsList({
       page: currentPage.value,
       pageSize: pageSize.value,
       ...searchForm,
     })
-    tableData.value = res.data.records
+
+    console.log(res.data.rows)
+
+    goodsMinStockMap.value = Object.fromEntries(
+        res.data.rows.map((g) => [g.code, g.minStock])
+    )
+
+    console.log(goodsMinStockMap.value)
+
+    tableData.value = res.data.rows
     total.value = res.data.total
   } finally {
     loading.value = false
   }
 }
 
-const handleSearch = () => { currentPage.value = 1; loadData() }
+const handleSearch = () => {
+  currentPage.value = 1
+  loadData()
+}
+
 const handleReset = () => {
   Object.assign(searchForm, { goods_name: '', goods_code: '' })
   currentPage.value = 1
@@ -94,23 +107,23 @@ const handleReset = () => {
 }
 
 const getStockTagType = (row) => {
-  const min = goodsMinStockMap[row.goods_id] ?? 0
-  if (row.quantity <= min) return 'danger'
-  if (row.quantity <= min * 1.5) return 'warning'
+  const min = goodsMinStockMap.value[row.code] ?? 0
+  if (row.status <= min) return 'danger'
+  if (row.status <= min * 1.5) return 'warning'
   return 'success'
 }
 
 const getStockStatusText = (row) => {
-  const min = goodsMinStockMap[row.goods_id] ?? 0
-  if (row.quantity <= min) return '库存预警'
-  if (row.quantity <= min * 1.5) return '库存偏低'
+  const min = goodsMinStockMap.value[row.code] ?? 0
+  if (row.status <= min) return '库存预警'
+  if (row.status <= min * 1.5) return '库存偏低'
   return '库存正常'
 }
 
 const getStockStatusClass = (row) => {
-  const min = goodsMinStockMap[row.goods_id] ?? 0
-  if (row.quantity <= min) return 'text-red-500 font-bold'
-  if (row.quantity <= min * 1.5) return 'text-orange-400'
+  const min = goodsMinStockMap.value[row.code] ?? 0
+  if (row.status <= min) return 'text-red-500 font-bold'
+  if (row.status <= min * 1.5) return 'text-orange-400'
   return 'text-green-500'
 }
 
