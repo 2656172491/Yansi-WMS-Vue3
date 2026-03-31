@@ -1,22 +1,10 @@
 // src/api/goods.js — 物资管理 API（当前使用 Mock 数据）
 // 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
-
-import request from '@/utils/request.js'
 import { MOCK_GOODS } from '@/constants/wms.js'
 
 // 本地可写副本（运行时增删改）
 let goods = [...MOCK_GOODS.map((g) => ({ ...g }))]
 let nextId = Math.max(...goods.map((g) => g.id)) + 1
-
-
-export function getGoodsList(params = {}) {
-  // 后端就绪后替换为：return request.get('/inventory/list', { params })
-  return request({
-    url: '/goods',
-    method: 'GET',
-    params: params,
-  })
-}
 
 /**
  * 新增物资

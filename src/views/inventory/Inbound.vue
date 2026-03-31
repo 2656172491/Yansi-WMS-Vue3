@@ -70,7 +70,7 @@ import { ElMessage } from 'element-plus'
 import { Refresh} from '@element-plus/icons-vue'
 import { inbound, getRecordList } from '@/api/inventory.js'
 import Pagination from '@/components/Pagination.vue'
-import {getGoodsList} from "@/api/goods.js";
+import {getGoodsList} from "@/api/api.js";
 
 const formRef = ref(null)
 const submitting = ref(false)
@@ -124,8 +124,9 @@ const recordTotal = ref(0)
 const loadRecords = async () => {
   recordLoading.value = true
   try {
-    const res = await getRecordList({ type: 1, page: recordPage.value, pageSize: recordPageSize.value })
-    records.value = res.data.records
+    const res = await getRecordList({ type: 1, pageNum: recordPage.value, pageSize: recordPageSize.value })
+    console.table(res.data.rows)
+    records.value = res.data.rows
     recordTotal.value = res.data.total
   } finally {
     recordLoading.value = false

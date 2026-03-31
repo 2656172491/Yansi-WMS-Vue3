@@ -93,9 +93,8 @@
 <script setup>
 import {computed, markRaw, onMounted, reactive, ref} from 'vue'
 import { Box, Goods, Download, Upload, Bell } from '@element-plus/icons-vue'
-import {getActivities } from '@/api/home.js'
+import {getActivities, getOverview} from '@/api/api.js'
 import {useUserStore} from "@/store/user.js";
-import {getOverview} from "@/api/statistics.js";
 
 const userStore = useUserStore()
 

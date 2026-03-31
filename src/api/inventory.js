@@ -13,9 +13,6 @@ let nextRecordId = Math.max(...records.map((r) => r.id)) + 1
 
 /**
  * 物资入库
- * 接口：POST /api/inventory/inbound
- * @param {{ goods_id: number, quantity: number, remark?: string }} data
- * @returns {Promise<object>} 新生成的出入库记录，含 id、before_quantity、after_quantity、create_time
  */
 export function inbound(data) {
   console.log(data)
@@ -87,20 +84,10 @@ export function outbound(data) {
  *   - records[]: { id, goods_id, goods_name, type, quantity, before_quantity, after_quantity, operator, remark, create_time }
  */
 export function getRecordList(params = {}) {
-  // 后端就绪后替换为：return request.get('/inventory/records', { params })
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      let list = [...records]
-      if (params.type !== undefined && params.type !== '') {
-        list = list.filter((r) => r.type === Number(params.type))
-      }
-      if (params.goods_name) list = list.filter((r) => r.goods_name.includes(params.goods_name))
-      const page = params.page || 1
-      const pageSize = params.pageSize || 10
-      const total = list.length
-      const data = list.slice((page - 1) * pageSize, page * pageSize)
-      resolve({ code: 200, msg: '获取成功', data: { records: data, total, page, pageSize } })
-    }, 300)
+  return request({
+    url: '/records',
+    method: 'GET',
+    params: params
   })
 }
 

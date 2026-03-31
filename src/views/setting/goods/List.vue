@@ -86,10 +86,11 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
-import { getGoodsList, deleteGoods } from '@/api/goods.js'
+import { getGoodsList } from '@/api/api.js'
 import { CATEGORY_OPTIONS, CATEGORY_MAP } from '@/constants/wms.js'
 import Pagination from '@/components/Pagination.vue'
 import AddEdit from './AddEdit.vue'
+import {deleteGoods} from "@/api/goods.js";
 
 const loading = ref(false)
 const tableData = ref([])

@@ -112,7 +112,7 @@ import {
   Goods,
   Setting, ArrowDown
 } from '@element-plus/icons-vue'
-import * as auth from "@/api/auth.js";
+import * as auth from "@/api/api.js";
 import {useUserStore} from "@/store/user.js";
 
 const router = useRouter()

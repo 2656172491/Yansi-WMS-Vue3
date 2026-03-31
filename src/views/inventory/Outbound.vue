@@ -6,18 +6,18 @@
       </template>
 
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" style="max-width: 520px">
-        <el-form-item label="物资" prop="goods_id">
+        <el-form-item label="物资" prop="id">
           <el-select
-            v-model="form.goods_id"
+            v-model="form.id"
             placeholder="请选择物资"
             filterable
             style="width: 100%"
           >
             <el-option
               v-for="item in inventoryList"
-              :key="item.goods_id"
+              :key="item.id"
               :label="`${item.goods_name}（当前库存：${item.quantity}）`"
-              :value="item.goods_id"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -78,15 +78,15 @@ const formRef = ref(null)
 const submitting = ref(false)
 const inventoryList = ref([])
 
-const form = reactive({ goods_id: '', quantity: 1, remark: '' })
+const form = reactive({ id: '', quantity: 1, remark: '' })
 const rules = {
-  goods_id: [{ required: true, message: '请选择物资', trigger: 'change' }],
+  id: [{ required: true, message: '请选择物资', trigger: 'change' }],
   quantity:  [{ required: true, message: '请输入出库数量', trigger: 'blur' }],
 }
 
 const currentStock = computed(() => {
-  if (!form.goods_id) return null
-  return inventoryList.value.find((i) => i.goods_id === form.goods_id)?.quantity ?? null
+  if (!form.id) return null
+  return inventoryList.value.find((i) => i.id === form.id)?.quantity ?? null
 })
 
 const loadInventory = async () => {
@@ -113,7 +113,7 @@ const handleSubmit = async () => {
 
 const resetForm = () => {
   formRef.value?.resetFields()
-  Object.assign(form, { goods_id: '', quantity: 1, remark: '' })
+  Object.assign(form, { id: '', quantity: 1, remark: '' })
 }
 
 // 出库记录

@@ -57,7 +57,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { Search, Refresh } from '@element-plus/icons-vue'
 import { CATEGORY_MAP } from '@/constants/wms.js'
 import Pagination from '@/components/Pagination.vue'
-import {getGoodsList} from "@/api/goods.js";
+import {getGoodsList} from "@/api/api.js";
 
 const loading = ref(false)
 const tableData = ref([])

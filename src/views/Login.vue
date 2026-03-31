@@ -58,7 +58,7 @@
 import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-import {login} from "@/api/auth.js";
+import {login} from "@/api/api.js";
 import {useUserStore} from "@/store/user.js";
 
 const router = useRouter();

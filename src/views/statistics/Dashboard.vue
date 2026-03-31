@@ -33,8 +33,8 @@
             <div class="panel-header">
               <span class="panel-title">出入库趋势</span>
               <el-radio-group v-model="chartPeriod" size="small" @change="loadTrend">
-                <el-radio-button label="week">本周</el-radio-button>
-                <el-radio-button label="month">本月</el-radio-button>
+                <el-radio-button value="week">本周</el-radio-button>
+                <el-radio-button value="month">本月</el-radio-button>
               </el-radio-group>
             </div>
           </template>
@@ -49,7 +49,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, markRaw, nextTick } from 'vue'
 import * as echarts from 'echarts'
-import { getOverview, getTrend} from '@/api/statistics.js'
+import { getOverview, getTrend} from '@/api/api.js'
 import { Bell, Download, Goods, Upload } from '@element-plus/icons-vue'
 
 const statCards = ref([
@@ -63,10 +63,11 @@ const loadOverview = async () => {
   try {
     const res = await getOverview()
     const d = res.data || {}
+    console.log(d)
     statCards.value = [
       { title: '物资总数', value: d.CountGoods ?? 0, icon: markRaw(Goods), colorClass: 'blue' },
       { title: '今日入库', value: d.TodayInGoods ?? 0, icon: markRaw(Download), colorClass: 'green' },
-      { title: '今日出库', value: d.todayOutbound ?? 0, icon: markRaw(Upload), colorClass: 'orange' },
+      { title: '今日出库', value: d.TodayOutGoods ?? 0, icon: markRaw(Upload), colorClass: 'orange' },
       { title: '库存预警', value: d.InventoryWarning, icon: markRaw(Bell), colorClass: 'red' },
     ]
   } catch (e) {
@@ -128,7 +129,7 @@ const onResize = () => {
 onMounted(async () => {
   await loadOverview()
   await initTrendChart()
-  await Promise.all(loadTrend())
+  await loadTrend()
   window.addEventListener('resize', onResize)
 })
 
