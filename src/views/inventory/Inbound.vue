@@ -8,16 +8,16 @@
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" style="max-width: 520px">
         <el-form-item label="物资" prop="goods_id">
           <el-select
-            v-model="form.goods_id"
+            v-model="form.id"
             placeholder="请选择物资"
             filterable
             style="width: 100%"
           >
             <el-option
-              v-for="item in inventoryList"
-              :key="item.goods_id"
-              :label="`${item.goods_name}（当前库存：${item.quantity}）`"
-              :value="item.goods_id"
+              v-for="item in GoodsList"
+              :key="item.code"
+              :label="`${item.name}（当前库存：${item.status}）`"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -67,24 +67,29 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Refresh } from '@element-plus/icons-vue'
-import { getInventoryAll, inbound, getRecordList } from '@/api/inventory.js'
+import { Refresh} from '@element-plus/icons-vue'
+import { inbound, getRecordList } from '@/api/inventory.js'
 import Pagination from '@/components/Pagination.vue'
+import {getGoodsList} from "@/api/goods.js";
 
 const formRef = ref(null)
 const submitting = ref(false)
-const inventoryList = ref([])
+const GoodsList = ref([])
 
-const form = reactive({ goods_id: '', quantity: 1, remark: '' })
+const form = reactive({ id: '', quantity: 1, remark: '' })
+
+// 规则
 const rules = {
-  goods_id: [{ required: true, message: '请选择物资', trigger: 'change' }],
+  id: [{ required: true, message: '请选择物资', trigger: 'change' }],
   quantity:  [{ required: true, message: '请输入入库数量', trigger: 'blur' }],
 }
 
-const loadInventory = async () => {
-  const res = await getInventoryAll()
-  inventoryList.value = res.data
+// 加载物资列表
+const loadGoods = async () => {
+  const res = await getGoodsList()
+  GoodsList.value = res.data.rows
 }
+
 
 const handleSubmit = async () => {
   const valid = await formRef.value?.validate().catch(() => false)
@@ -94,7 +99,7 @@ const handleSubmit = async () => {
     await inbound({ ...form })
     ElMessage.success('入库成功')
     resetForm()
-    loadInventory()
+    loadGoods()
     loadRecords()
   } catch (err) {
     ElMessage.error(err.message || '入库失败')
@@ -103,9 +108,10 @@ const handleSubmit = async () => {
   }
 }
 
+
 const resetForm = () => {
   formRef.value?.resetFields()
-  Object.assign(form, { goods_id: '', quantity: 1, remark: '' })
+  Object.assign(form, { id: '', quantity: 1, remark: '' })
 }
 
 // 入库记录
@@ -127,7 +133,7 @@ const loadRecords = async () => {
 }
 
 onMounted(() => {
-  loadInventory()
+  loadGoods()
   loadRecords()
 })
 </script>

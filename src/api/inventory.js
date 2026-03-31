@@ -2,22 +2,12 @@
 // 后端集成时：取消每个函数内的注释行，删除 mock 实现，即可切换到真实请求。
 
 import { MOCK_INVENTORY, MOCK_RECORDS } from '@/constants/wms.js'
+import request from "@/utils/request.js";
 
 // 运行时可写副本
 let inventory = [...MOCK_INVENTORY.map((i) => ({ ...i }))]
 let records = [...MOCK_RECORDS.map((r) => ({ ...r }))]
 let nextRecordId = Math.max(...records.map((r) => r.id)) + 1
-
-// ===================== 库存查询 =====================
-
-/**
- * 分页查询库存列表
- * 接口：GET /api/inventory/list
- * @param {{ page?: number, pageSize?: number, goods_name?: string, goods_code?: string }} params
- * @returns {Promise<{ records: object[], total: number, page: number, pageSize: number }>}
- *   - records[]: { id, goods_id, goods_name, goods_code, category_id, unit, warehouse_id, quantity }
- */
-
 
 // ===================== 入库 =====================
 
@@ -28,33 +18,22 @@ let nextRecordId = Math.max(...records.map((r) => r.id)) + 1
  * @returns {Promise<object>} 新生成的出入库记录，含 id、before_quantity、after_quantity、create_time
  */
 export function inbound(data) {
-  // 后端就绪后替换为：return request.post('/inventory/inbound', data)
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const inv = inventory.find((i) => i.goods_id === data.goods_id)
-      if (!inv) {
-        reject(new Error('库存记录不存在'))
-        return
-      }
-      const before = inv.quantity
-      inv.quantity += data.quantity
-      const record = {
-        id: nextRecordId++,
-        goods_id: inv.goods_id,
-        goods_name: inv.goods_name,
-        type: 1,
-        quantity: data.quantity,
-        before_quantity: before,
-        after_quantity: inv.quantity,
-        operator: 'admin',
-        remark: data.remark || '',
-        create_time: new Date().toLocaleString('zh-CN'),
-      }
-      records.unshift(record)
-      resolve({ code: 200, msg: '入库成功', data: record })
-    }, 500)
+  console.log(data)
+  const url = '/goods/' + data.id
+
+  return request({
+    url: url,
+    method: "PUT",
+    data: {
+      goodsId: data.id,
+      type: 1,
+      quantity: data.quantity,
+      remark: data.remark,
+      warehouseId: 1
+    }
   })
 }
+
 
 // ===================== 出库 =====================
 

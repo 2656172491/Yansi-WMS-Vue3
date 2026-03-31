@@ -19,26 +19,6 @@ export function getGoodsList(params = {}) {
 }
 
 /**
- * 根据 ID 获取物资详情
- * 接口：GET /api/goods/:id
- * @param {number} id — 物资 ID
- * @returns {Promise<object>} 物资详情对象，字段同 getGoodsList 的 records 项
- */
-export function getGoodsById(id) {
-  // 后端就绪后替换为：return request.get(`/goods/${id}`)
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const item = goods.find((g) => g.id === id)
-      if (item) {
-        resolve({ code: 200, msg: '获取成功', data: { ...item } })
-      } else {
-        reject(new Error('物资不存在'))
-      }
-    }, 200)
-  })
-}
-
-/**
  * 新增物资
  * 接口：POST /api/goods
  * @param {{ name: string, code: string, category_id: number, specification?: string, unit: string, price: number, min_stock: number, max_stock: number, status?: number }} data
