@@ -147,11 +147,6 @@ const sidebarMenus = [
         title: '出库管理',
         path: '/inventory/outbound',
       },
-      {
-        index: 'stock-check',
-        title: '库存盘点',
-        path: '/inventory/stock-check',
-      },
     ],
   },
   {

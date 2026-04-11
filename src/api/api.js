@@ -65,3 +65,53 @@ export function getTrend(params={}) {
         params: params,
     })
 }
+
+/**
+ * 根据商品id获取库存数量
+ * @param id 商品id
+ * @returns {*}
+ */
+export function getQuantityById(id) {
+    return request({
+        url: 'inventory',
+        method: 'GET',
+        params: {
+            goodId:id,
+        }
+    })
+}
+
+/**
+ * 根据商品id获取商品名称
+ * @param id 商品id
+ * @returns {*}
+ */
+export function getGoodById(id){
+    const url = "goods/"+id
+    return request({
+        url: url,
+        method: 'GET'
+    })
+}
+
+/**
+ * 出入库数据更新
+ * @param data 出入库数据
+ * @returns {*}
+ */
+export function updateGoods(data) {
+    console.log(data.id)
+    const url = '/goods/' + data.id
+
+    return request({
+        url: url,
+        method: "PUT",
+        data: {
+            goodsId: data.id,
+            type: data.type,
+            quantity: data.quantity,
+            remark: data.remark,
+            warehouseId: 1
+        }
+    })
+}

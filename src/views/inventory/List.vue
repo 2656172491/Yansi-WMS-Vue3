@@ -31,7 +31,7 @@
         <el-table-column prop="unit" label="单位" width="70" />
         <el-table-column prop="status" label="当前库存" width="100">
           <template #default="{ row }">
-            <el-tag :type="getStockTagType(row)" size="small">{{ row.status }}</el-tag>
+            <el-tag :type="getStockTagType(row)" size="small">{{ row.quantity }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="库存状态" width="100">
@@ -57,7 +57,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { Search, Refresh } from '@element-plus/icons-vue'
 import { CATEGORY_MAP } from '@/constants/wms.js'
 import Pagination from '@/components/Pagination.vue'
-import {getGoodsList} from "@/api/api.js";
+import {getGoodsList, getQuantityById} from "@/api/api.js";
 
 const loading = ref(false)
 const tableData = ref([])
@@ -80,13 +80,21 @@ const loadData = async () => {
       ...searchForm,
     })
 
-    console.log(res.data.rows)
-
     goodsMinStockMap.value = Object.fromEntries(
         res.data.rows.map((g) => [g.code, g.minStock])
     )
 
-    console.log(goodsMinStockMap.value)
+    // ✅ 正确写法：等所有数量回来再渲染表格
+    await Promise.all(
+        res.data.rows.map(async (row) => {
+          try {
+            const qRes = await getQuantityById(row.id)
+            row.quantity = qRes.data[0]?.quantity || 0
+          } catch (err) {
+            row.quantity = 0
+          }
+        })
+    )
 
     tableData.value = res.data.rows
     total.value = res.data.total
@@ -108,22 +116,22 @@ const handleReset = () => {
 
 const getStockTagType = (row) => {
   const min = goodsMinStockMap.value[row.code] ?? 0
-  if (row.status <= min) return 'danger'
-  if (row.status <= min * 1.5) return 'warning'
+  if (row.quantity <= min) return 'danger'
+  if (row.quantity <= min * 1.5) return 'warning'
   return 'success'
 }
 
 const getStockStatusText = (row) => {
   const min = goodsMinStockMap.value[row.code] ?? 0
-  if (row.status <= min) return '库存预警'
-  if (row.status <= min * 1.5) return '库存偏低'
+  if (row.quantity <= min) return '库存预警'
+  if (row.quantity <= min * 1.5) return '库存偏低'
   return '库存正常'
 }
 
 const getStockStatusClass = (row) => {
   const min = goodsMinStockMap.value[row.code] ?? 0
-  if (row.status <= min) return 'text-red-500 font-bold'
-  if (row.status <= min * 1.5) return 'text-orange-400'
+  if (row.quantity <= min) return 'text-red-500 font-bold'
+  if (row.quantity <= min * 1.5) return 'text-orange-400'
   return 'text-green-500'
 }
 

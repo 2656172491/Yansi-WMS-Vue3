@@ -35,12 +35,6 @@ const routes = [
         meta: { title: '库存列表', module: '库存管理' },
       },
       {
-        path: 'inventory/stock-check',
-        name: 'inventory-stock-check',
-        component: () => import('@/views/inventory/StockCheck.vue'),
-        meta: { title: '库存盘点', module: '库存管理' },
-      },
-      {
         path: 'inventory/inbound',
         name: 'inventory-inbound',
         component: () => import('@/views/inventory/Inbound.vue'),
