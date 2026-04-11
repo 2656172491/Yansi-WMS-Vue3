@@ -98,9 +98,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
-import { getRecordList } from '@/api/inventory.js'
 import Pagination from '@/components/Pagination.vue'
-import { getGoodById, getGoodsList, getQuantityById, updateGoods } from '@/api/api.js'
+import {getGoodById, getGoodsList, getQuantityById, getRecordList, updateGoods} from '@/api/api.js'
 
 const formRef = ref(null)
 const submitting = ref(false)
