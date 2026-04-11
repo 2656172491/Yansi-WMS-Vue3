@@ -131,3 +131,89 @@ export function updateGoods(data) {
         }
     })
 }
+
+/**
+ * 获取用户列表
+ * @returns {*}
+ */
+export function getUsers(params = {}) {
+    return request({
+        url: '/user',
+        method: 'GET',
+        params: params
+    })
+}
+
+/**
+ * 根据角色id获取角色信息
+ * @param id
+ * @returns {*}
+ */
+export function getRoleById(id) {
+    const url = '/roles/' + id
+    return request({
+        url: url,
+        method: 'GET',
+    })
+}
+
+/**
+ * 根据用户id获取用户信息
+ * @param id
+ * @returns {*}
+ */
+export function getUserById(id) {
+    const url = '/user/' + id;
+    return request({
+        url: url,
+        method: 'GET',
+    })
+}
+
+export function addUser(data) {
+    console.log(data)
+    return request({
+        url: '/user',
+        method: 'POST',
+        data: data
+    })
+}
+
+export function updateUser(data) {
+    return request({
+        url: '/user',
+        method: 'PUT',
+        data: data
+    })
+}
+
+export function deleteUser(id) {
+    const url = '/user/' + id;
+    return request({
+        url: url,
+        method: 'DELETE',
+    })
+}
+
+export function updateUserStatus(id,status) {
+    const url = '/user/upStatus/' + id;
+    return request({
+        url: url,
+        method: 'PUT',
+        data: {status: status},
+    })
+}
+
+export function getUserStats() {
+    return request({
+        url: '/user/stats',
+        method: 'GET',
+    })
+}
+
+export function getRoleList(){
+    return request({
+        url: '/roles',
+        method: 'GET',
+    })
+}
