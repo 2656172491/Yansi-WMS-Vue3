@@ -279,3 +279,49 @@ export function getRoleStats() {
     })
 }
 
+export function getWarehouseList(){
+    return request({
+        url: '/warehouses',
+        method: 'GET',
+    })
+}
+
+export function getWarehouseById(id){
+    const url = '/warehouses/' + id;
+    return request({
+        url: url,
+        method: 'GET',
+    })
+}
+
+export function addWarehouse(data) {
+    return request({
+        url: '/warehouses',
+        method: 'POST',
+        data: data
+    })
+}
+
+export function updateWarehouse(data) {
+    const url = '/warehouses/' + data.id;
+    return request({
+        url: url,
+        method: 'PUT',
+        data: data
+    })
+}
+
+export function deleteWarehouse(id) {
+    const url = '/warehouses/' + id;
+    return request({
+        url: url,
+        method: 'DELETE',
+    })
+}
+
+export function getWarehouseStats() {
+    return request({
+        url: '/warehouses/stats',
+        method: 'GET',
+    })
+}
