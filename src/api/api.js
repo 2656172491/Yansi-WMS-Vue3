@@ -170,6 +170,11 @@ export function getUserById(id) {
     })
 }
 
+/**
+ * 添加用户
+ * @param data
+ * @returns {*}
+ */
 export function addUser(data) {
     console.log(data)
     return request({
@@ -179,6 +184,11 @@ export function addUser(data) {
     })
 }
 
+/**
+ * 更新用户信息
+ * @param data
+ * @returns {*}
+ */
 export function updateUser(data) {
     return request({
         url: '/user',
@@ -187,6 +197,11 @@ export function updateUser(data) {
     })
 }
 
+/**
+ * 删除用户
+ * @param id
+ * @returns {*}
+ */
 export function deleteUser(id) {
     const url = '/user/' + id;
     return request({
@@ -195,6 +210,12 @@ export function deleteUser(id) {
     })
 }
 
+/**
+ * 修改用户状态
+ * @param id
+ * @param status
+ * @returns {*}
+ */
 export function updateUserStatus(id,status) {
     const url = '/user/upStatus/' + id;
     return request({
@@ -204,6 +225,10 @@ export function updateUserStatus(id,status) {
     })
 }
 
+/**
+ * 获取用户管理数据卡片信息
+ * @returns {*}
+ */
 export function getUserStats() {
     return request({
         url: '/user/stats',
@@ -211,9 +236,46 @@ export function getUserStats() {
     })
 }
 
+/**
+ * 获取角色列表
+ * @returns {*}
+ */
 export function getRoleList(){
     return request({
         url: '/roles',
         method: 'GET',
     })
 }
+
+export function addRole(data) {
+    return request({
+        url: '/roles',
+        method: 'POST',
+        data: data
+    })
+}
+
+export function updateRole(data) {
+    const url = '/roles/' + data.id;
+    return request({
+        url: url,
+        method: 'PUT',
+        data: data
+    })
+}
+
+export function deleteRole(id) {
+    const url = '/roles/' + id;
+    return request({
+        url: url,
+        method: 'DELETE',
+    })
+}
+
+export function getRoleStats() {
+    return request({
+        url: '/roles/stats',
+        method: 'GET',
+    })
+}
+
