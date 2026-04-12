@@ -334,11 +334,6 @@ onMounted(async () => {
   color: #e6a23c;
 }
 
-.summary-icon.red {
-  background: #fdecec;
-  color: #f56c6c;
-}
-
 .summary-title {
   font-size: 14px;
   color: #909399;
