@@ -1,4 +1,3 @@
-<!-- 操作日志 -->
 <template>
   <div class="logs-page">
     <el-card class="filter-card" shadow="never">
@@ -27,11 +26,10 @@
               class="filter-input"
           >
             <el-option label="登录" value="login" />
+            <el-option label="查询" value="get" />
+            <el-option label="修改" value="set" />
             <el-option label="新增" value="create" />
-            <el-option label="修改" value="update" />
             <el-option label="删除" value="delete" />
-            <el-option label="盘点" value="check" />
-            <el-option label="出入库" value="inventory" />
           </el-select>
         </el-form-item>
 
@@ -80,9 +78,10 @@
         </div>
       </template>
 
-      <el-table :data="filteredLogs" border stripe v-loading="loading" style="width: 100%">
+      <el-table :data="pagedLogs" border stripe v-loading="loading" style="width: 100%">
         <el-table-column prop="time" label="操作时间" width="180" />
         <el-table-column prop="operator" label="操作人" width="120" />
+
         <el-table-column prop="typeLabel" label="操作类型" width="120">
           <template #default="{ row }">
             <el-tag :type="getTypeTag(row.type)" effect="light" size="small">
@@ -90,9 +89,11 @@
             </el-tag>
           </template>
         </el-table-column>
+
         <el-table-column prop="module" label="模块" width="140" />
         <el-table-column prop="content" label="操作内容" min-width="260" />
         <el-table-column prop="ip" label="IP 地址" width="140" />
+
         <el-table-column label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="row.success ? 'success' : 'danger'" effect="light" size="small">
@@ -100,6 +101,7 @@
             </el-tag>
           </template>
         </el-table-column>
+
         <el-table-column label="详情" width="100" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="showDetail(row)">查看</el-button>
@@ -138,9 +140,14 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, onMounted } from 'vue'
 import { Search, Refresh, Document, Clock, User, DataLine } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+
+import {
+  getLoginLogList,
+  getOperateLogList
+} from '@/api/api.js'
 
 const loading = ref(false)
 const currentPage = ref(1)
@@ -149,88 +156,76 @@ const pageSize = ref(10)
 const queryForm = reactive({
   operator: '',
   type: '',
-  timeRange: [],
+  timeRange: []
 })
 
-const logs = ref([
-  {
-    id: 1,
-    time: '2026-03-27 09:18:22',
-    operator: '管理员',
-    type: 'login',
-    typeLabel: '登录',
-    module: '系统登录',
-    content: '管理员登录了系统',
-    ip: '192.168.1.10',
-    success: true,
-  },
-  {
-    id: 2,
-    time: '2026-03-27 09:30:10',
-    operator: '管理员',
-    type: 'inventory',
-    typeLabel: '出入库',
-    module: '入库管理',
-    content: '新增了 1 条入库记录，物资：笔记本电脑',
-    ip: '192.168.1.10',
-    success: true,
-  },
-  {
-    id: 3,
-    time: '2026-03-27 10:05:33',
-    operator: '张三',
-    type: 'check',
-    typeLabel: '盘点',
-    module: '库存盘点',
-    content: '完成了库存盘点单 CK20260327001',
-    ip: '192.168.1.22',
-    success: true,
-  },
-  {
-    id: 4,
-    time: '2026-03-27 10:20:45',
-    operator: '李四',
-    type: 'update',
-    typeLabel: '修改',
-    module: '物资管理',
-    content: '修改了物资【A4打印纸】的库存预警值',
-    ip: '192.168.1.31',
-    success: true,
-  },
-  {
-    id: 5,
-    time: '2026-03-27 11:02:11',
-    operator: '系统',
-    type: 'delete',
-    typeLabel: '删除',
-    module: '操作日志',
-    content: '清理了 30 天前的历史日志',
-    ip: '127.0.0.1',
-    success: true,
-  },
-  {
-    id: 6,
-    time: '2026-03-27 11:40:00',
-    operator: '管理员',
-    type: 'inventory',
-    typeLabel: '出入库',
-    module: '出库管理',
-    content: '出库失败：库存不足',
-    ip: '192.168.1.10',
-    success: false,
-  },
-])
+const logs = ref([])
+
+const mapLoginLog = (item) => ({
+  id: item.id,
+  time: item.createTime,
+  operator: item.username,
+  type: 'login',
+  typeLabel: '登录',
+  module: '系统登录',
+  content: item.message,
+  ip: item.ip,
+  success: item.status === 1
+})
+
+const mapOperateLog = (item) => ({
+  id: item.id,
+  time: item.createTime,
+  operator: item.username,
+  type: item.type || 'set',
+  typeLabel: getOperateTypeLabel(item.type),
+  module: item.module,
+  content: item.content,
+  ip: item.ip,
+  success: true
+})
+
+const getOperateTypeLabel = (type) => {
+  const map = {
+    get: '查询',
+    set: '修改',
+    create: '新增',
+    delete: '删除'
+  }
+  return map[type] || '操作'
+}
 
 const getTypeTag = (type) => {
   const map = {
     login: 'success',
+    get: 'info',
+    set: 'warning',
     create: 'primary',
-    update: 'warning',
-    delete: 'danger',
-    check: 'info',
-    inventory: 'success',
+    delete: 'danger'
   }
   return map[type] || 'info'
+}
+
+const loadLogs = async () => {
+  loading.value = true
+  try {
+    const [loginRes, operateRes] = await Promise.all([
+      getLoginLogList(),
+      getOperateLogList()
+    ])
+    console.log(operateRes.data)
+    const loginLogs = (loginRes.data || []).map(mapLoginLog)
+    const operateLogs = (operateRes.data || []).map(mapOperateLog)
+    console.log(operateLogs)
+    logs.value = [...loginLogs, ...operateLogs].sort((a, b) => {
+      return new Date(b.time) - new Date(a.time)
+    })
+  } catch (err) {
+    logs.value = []
+    ElMessage.error('加载日志失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 const filteredLogs = computed(() => {
@@ -252,8 +247,12 @@ const filteredLogs = computed(() => {
     })
   }
 
+  return list
+})
+
+const pagedLogs = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
-  return list.slice(start, start + pageSize.value)
+  return filteredLogs.value.slice(start, start + pageSize.value)
 })
 
 const summaryCards = computed(() => [
@@ -261,26 +260,28 @@ const summaryCards = computed(() => [
     title: '总日志数',
     value: logs.value.length,
     icon: Document,
-    colorClass: 'blue',
+    colorClass: 'blue'
   },
   {
     title: '今日操作',
-    value: logs.value.filter((item) => item.time.startsWith('2026-03-27')).length,
+    value: logs.value.filter((item) => item.time?.slice(0, 10) === new Date().toISOString().slice(0, 10)).length,
     icon: Clock,
-    colorClass: 'green',
+    colorClass: 'green'
   },
   {
     title: '操作人数',
     value: new Set(logs.value.map((item) => item.operator)).size,
     icon: User,
-    colorClass: 'orange',
+    colorClass: 'orange'
   },
   {
     title: '成功率',
-    value: `${Math.round((logs.value.filter((item) => item.success).length / logs.value.length) * 100)}%`,
+    value: logs.value.length
+        ? `${Math.round((logs.value.filter((item) => item.success).length / logs.value.length) * 100)}%`
+        : '0%',
     icon: DataLine,
-    colorClass: 'red',
-  },
+    colorClass: 'red'
+  }
 ])
 
 const detailVisible = ref(false)
@@ -291,7 +292,7 @@ const detailData = reactive({
   module: '',
   content: '',
   ip: '',
-  success: true,
+  success: true
 })
 
 const showDetail = (row) => {
@@ -318,6 +319,10 @@ const handlePageChange = (page) => {
 const handleExport = () => {
   ElMessage.success('日志导出成功')
 }
+
+onMounted(() => {
+  loadLogs()
+})
 </script>
 
 <style scoped>

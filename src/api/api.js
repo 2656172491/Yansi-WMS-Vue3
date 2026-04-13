@@ -325,3 +325,17 @@ export function getWarehouseStats() {
         method: 'GET',
     })
 }
+
+export function getLoginLogList(){
+    return request({
+        url: 'logs/login',
+        method: 'GET',
+    })
+}
+
+export function getOperateLogList() {
+    return request({
+        url: 'logs/operate',
+        method: 'GET',
+    })
+}
