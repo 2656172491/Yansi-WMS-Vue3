@@ -99,7 +99,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
 import Pagination from '@/components/Pagination.vue'
-import {getGoodById, getGoodsList, getQuantityById, getRecordList, updateGoods} from '@/api/api.js'
+import {getGoodById, getGoodsList, getQuantityById, getRecordList, updateInventory} from '@/api/api.js'
 
 const formRef = ref(null)
 const submitting = ref(false)
@@ -156,7 +156,7 @@ const handleSubmit = async () => {
 
   submitting.value = true
   try {
-    await updateGoods({ ...form })
+    await updateInventory({ ...form })
     ElMessage.success('入库成功')
     resetForm()
     await loadGoods()

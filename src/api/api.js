@@ -115,7 +115,7 @@ export function getRecordList(params = {}) {
  * @param data 出入库数据
  * @returns {*}
  */
-export function updateGoods(data) {
+export function updateInventory(data) {
     console.log(data.id)
     const url = '/goods/' + data.id
 
@@ -337,5 +337,36 @@ export function getOperateLogList() {
     return request({
         url: 'logs/operate',
         method: 'GET',
+    })
+}
+
+export function deleteGoods(id){
+    const url = '/goods/' + id;
+    return request({
+        url: url,
+        method: 'DELETE',
+    })
+}
+
+export function getCategoryList(){
+    return request({
+        url: '/category',
+        method: 'GET',
+    })
+}
+
+export function addGoods(data){
+    return request({
+        url: '/goods',
+        method: 'POST',
+        data: data
+    })
+}
+
+export function updateGoods(data){
+    return request({
+        url: '/goods',
+        method: 'PUT',
+        data: data
     })
 }
