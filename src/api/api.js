@@ -73,7 +73,7 @@ export function getTrend(params={}) {
  */
 export function getQuantityById(id) {
     return request({
-        url: 'inventory',
+        url: '/inventory',
         method: 'GET',
         params: {
             goodId:id,
